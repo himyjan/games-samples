@@ -11,7 +11,10 @@ UENUM(BlueprintType)
 enum class EWidgetType : uint8
 {
 	None,
-	PlayBoard
+	PlayBoard,
+	Garage,
+	PGS,
+	Store
 };
 /**
  * 
@@ -31,6 +34,8 @@ public:
 	virtual void BeginPlay() override;
 	
 	void AddWidgetToScreen(const EWidgetType WidgetType, int ZOrder = 0);
+	
+	void RemoveWidgetFromScreen(const EWidgetType WidgetType);
 	
 	UUserWidget* GetWidgetOfType(const EWidgetType WidgetType);
 	

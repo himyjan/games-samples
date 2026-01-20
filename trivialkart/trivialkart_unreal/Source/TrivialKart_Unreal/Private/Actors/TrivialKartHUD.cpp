@@ -26,6 +26,18 @@ void ATrivialKartHUD::AddWidgetToScreen(const EWidgetType WidgetType, int32 ZOrd
 	}
 }
 
+void ATrivialKartHUD::RemoveWidgetFromScreen(const EWidgetType WidgetType)
+{
+	if (!ActiveWidgets.Contains(WidgetType))
+	{
+		UE_LOG(LogTemplateHUD, Warning, TEXT("Widget is not on Screen"));
+		return;
+	}
+	ActiveWidgets[WidgetType]->RemoveFromParent();
+	ActiveWidgets.Remove(WidgetType);
+		
+}
+
 UUserWidget* ATrivialKartHUD::GetWidgetOfType(const EWidgetType WidgetType)
 {
 	if (!ActiveWidgets.Contains(WidgetType))
