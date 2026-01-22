@@ -12,7 +12,9 @@ public class TrivialKart_Unreal : ModuleRules
 			"Engine", 
 			"InputCore", 
 			"EnhancedInput", 
-			"Paper2D"
+			"Paper2D",
+			"Slate",
+			"SlateCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { 

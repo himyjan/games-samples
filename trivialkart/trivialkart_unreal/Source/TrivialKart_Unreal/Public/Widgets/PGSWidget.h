@@ -4,8 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "PGSWidget.generated.h"
 
+class UVerticalBox;
+class UPGSLayoutText;
+class UScrollBox;
+class UWidgetSwitcher;
+class UCheckBox;
+class UButton;
 /**
  * 
  */
@@ -14,4 +21,40 @@ class TRIVIALKART_UNREAL_API UPGSWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> BackButton;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCheckBox> AuthenticationCheckBox;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCheckBox> AchievementsCheckBox;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UWidgetSwitcher> ContentSwitcher;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UVerticalBox> AuthBox;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UScrollBox> AchievementsBox;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UPGSLayoutText> PGSTextTemplate;
+	
+protected:
+	UPROPERTY()
+	TArray<UCheckBox*> CheckBoxes;
+public:
+	void NativeConstruct() override;
+	void NativeDestruct() override;
+	
+private:
+	UFUNCTION()
+	void OnBackButtonClicked();
+	void SetCheckBoxState(bool bIsChecked, UCheckBox* CheckBox, int ActiveWidgetIndex);
+	UFUNCTION()
+	void OnAuthCheckBoxStateChanged(bool bIsChecked);
+	UFUNCTION()
+	void OnAchievementBoxStateChange(bool bIsChecked);
 };
