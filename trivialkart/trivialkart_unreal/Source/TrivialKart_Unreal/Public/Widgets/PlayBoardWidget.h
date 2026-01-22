@@ -39,4 +39,8 @@ private:
 	void OnPGSButtonClicked();
 	UFUNCTION()
 	void OnStoreButtonClicked();
+	
+public:
+	void UpdateFuelBar(const float FuelBarPercentage) const;
+	void UpdateDistanceText(const float Distance) const;
 };

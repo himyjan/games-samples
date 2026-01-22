@@ -11,7 +11,8 @@ public class TrivialKart_Unreal : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore", 
-			"EnhancedInput" 
+			"EnhancedInput", 
+			"Paper2D"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { 

@@ -2,6 +2,8 @@
 
 #include "Actors/TrivialKartHUD.h"
 #include "Components/Button.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 
 void UPlayBoardWidget::NativeConstruct()
@@ -57,4 +59,14 @@ void UPlayBoardWidget::OnStoreButtonClicked()
 			CurrentHUD->RemoveWidgetFromScreen(EWidgetType::PlayBoard);
 		}
 	}
+}
+
+void UPlayBoardWidget::UpdateFuelBar(const float FuelBarPercentage) const
+{
+	FuelBar->SetPercent(FuelBarPercentage);
+}
+
+void UPlayBoardWidget::UpdateDistanceText(const float Distance) const
+{
+	DistanceText->SetText(FText::FromString(FString::FromInt(Distance)));
 }

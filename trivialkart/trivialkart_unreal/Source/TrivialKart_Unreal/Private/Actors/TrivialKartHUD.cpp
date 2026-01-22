@@ -35,7 +35,6 @@ void ATrivialKartHUD::RemoveWidgetFromScreen(const EWidgetType WidgetType)
 	}
 	ActiveWidgets[WidgetType]->RemoveFromParent();
 	ActiveWidgets.Remove(WidgetType);
-		
 }
 
 UUserWidget* ATrivialKartHUD::GetWidgetOfType(const EWidgetType WidgetType)
