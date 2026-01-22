@@ -18,6 +18,21 @@ class TRIVIALKART_UNREAL_API ATrivialKartPlayerState : public APlayerState
 	
 	float Distance;
 	
+	UPROPERTY(EditAnywhere)
+	FString FuelAchievementName;
+	
+	UPROPERTY(EditAnywhere)
+	FString FuelAchievementID;
+	
+	UPROPERTY(EditAnywhere)
+	FString DistanceAchievementName;
+	
+	UPROPERTY(EditAnywhere)
+	FString DistanceAchievementID;
+	
+	UPROPERTY(EditAnywhere)
+	float DistanceAchievementThreshold;
+	
 public:
 	void BeginPlay() override;
 	

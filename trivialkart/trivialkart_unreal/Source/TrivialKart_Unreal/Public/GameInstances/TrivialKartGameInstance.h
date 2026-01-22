@@ -38,6 +38,12 @@ protected:
 	
 	TArray<FOnlineStoreOfferRef> StoreOffers;
 	
+	UPROPERTY(EditAnywhere)
+	FString LogInAchievementName;
+	
+	UPROPERTY(EditAnywhere)
+	FString LogInAchievementID;
+	
 private:
 	void OnLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId,
 						  const FString& Error);

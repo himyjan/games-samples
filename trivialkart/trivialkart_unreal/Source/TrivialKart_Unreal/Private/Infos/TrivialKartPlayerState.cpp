@@ -4,6 +4,7 @@
 #include "Infos/TrivialKartPlayerState.h"
 
 #include "Actors/TrivialKartHUD.h"
+#include "GameInstances/TrivialKartGameInstance.h"
 #include "Widgets/PlayBoardWidget.h"
 
 void ATrivialKartPlayerState::BeginPlay()
@@ -21,12 +22,28 @@ void ATrivialKartPlayerState::ConsumeFuel(const float FuelConsumption)
 {
 	Fuel -= FuelConsumption;
 	UpdateFuel();
+	if (Fuel <= 0.0f)
+	{
+		if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
+			Instance.IsValid())
+		{
+			Instance->AddAchievementProgress(100, FuelAchievementName, FuelAchievementID);
+		}
+	}
 }
 
 void ATrivialKartPlayerState::AddDistance(const float DistanceTravelled)
 {
 	Distance += DistanceTravelled;
 	UpdateDistance();
+	if (Distance >= DistanceAchievementThreshold)
+	{
+		if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
+			Instance.IsValid())
+		{
+			Instance->AddAchievementProgress(100, DistanceAchievementID, DistanceAchievementName);
+		}
+	}
 }
 
 float ATrivialKartPlayerState::GetFuel() const
