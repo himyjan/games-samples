@@ -131,7 +131,7 @@ void UTrivialKartGameInstance::OnLoginCompleted(int32 LocalUserNum, bool bWasSuc
 
 void UTrivialKartGameInstance::OnQueryAchievementsCompleted(const FUniqueNetId& UniqueNetId, bool bWasSuccessful)
 {
-	UE_LOG(LogTemplateGameInstance, Log, TEXT("Achievements Cached for User: %s has "), *UniqueNetId.ToString(), bWasSuccessful ? TEXT("Succeeded") : TEXT("Failed"));
+UE_LOG(LogTemplateGameInstance, Log, TEXT("Achievements Cached for User: %s has %s"), *UniqueNetId.ToString(), bWasSuccessful ? TEXT("Succeeded") : TEXT("Failed"));
 	if (bWasSuccessful)
 	{
 		AddAchievementProgress(20, LogInAchievementID, LogInAchievementName);
