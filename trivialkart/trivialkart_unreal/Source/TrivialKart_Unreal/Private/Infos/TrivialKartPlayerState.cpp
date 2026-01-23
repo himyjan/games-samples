@@ -41,7 +41,7 @@ void ATrivialKartPlayerState::AddDistance(const float DistanceTravelled)
 		if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
 			Instance.IsValid())
 		{
-			Instance->AddAchievementProgress(100, DistanceAchievementID, DistanceAchievementName);
+Instance->AddAchievementProgress(100, DistanceAchievementName, DistanceAchievementID);
 		}
 	}
 }
