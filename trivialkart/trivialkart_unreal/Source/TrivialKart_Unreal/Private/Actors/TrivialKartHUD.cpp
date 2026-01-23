@@ -41,7 +41,7 @@ UUserWidget* ATrivialKartHUD::GetWidgetOfType(const EWidgetType WidgetType)
 {
 	if (!ActiveWidgets.Contains(WidgetType))
 	{
-		UE_LOG(LogTemplateHUD, Warning, TEXT("Active widget does not exits"));
+UE_LOG(LogTemplateHUD, Warning, TEXT("Active widget does not exist"));
 		return nullptr;
 	}
 	return ActiveWidgets[WidgetType].Get();
