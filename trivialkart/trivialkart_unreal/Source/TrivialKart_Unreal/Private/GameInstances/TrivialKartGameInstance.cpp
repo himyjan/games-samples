@@ -102,8 +102,8 @@ void UTrivialKartGameInstance::StartPurchasing(FOnlineStoreOfferRef PurchaseItem
 void UTrivialKartGameInstance::OnLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId,
                                                 const FString& Error)
 {
-	UE_LOG(LogTemplateGameInstance, Log, TEXT("Local User: %d of Unique ID: %s has logged in with Status: %s"), 
-		LocalUserNum, *UserId.ToDebugString(), bWasSuccessful ? *Error : TEXT("Success"));
+UE_LOG(LogTemplateGameInstance, Log, TEXT("Local User: %d of Unique ID: %s has logged in with Status: %s"), 
+		LocalUserNum, *UserId.ToDebugString(), bWasSuccessful ? TEXT("Success") : *Error);
 	if (bWasSuccessful)
 	{
 		if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
