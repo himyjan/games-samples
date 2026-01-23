@@ -14,7 +14,7 @@ void ATrivialKartHUD::AddWidgetToScreen(const EWidgetType WidgetType, int32 ZOrd
 {
 	if (!WidgetTemplates.Contains(WidgetType))
 	{
-		UE_LOG(LogTemplateHUD, Warning, TEXT("Widget template does not exits"));
+UE_LOG(LogTemplateHUD, Warning, TEXT("Widget template does not exist"));
 		return;
 	}
 	const TWeakObjectPtr CurrentWidget = CreateWidget(GetOwningPlayerController(), 
