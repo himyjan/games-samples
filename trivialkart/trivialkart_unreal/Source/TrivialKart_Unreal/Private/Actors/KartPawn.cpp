@@ -98,7 +98,7 @@ void AKartPawn::Move(const FInputActionValue& Value)
 			AddActorLocalOffset(FVector(MoveAxisVector * MoveSpeed * GetWorld()->DeltaTimeSeconds, 0.0f, 0.0f));
 		
 			CurrentPlayerState->ConsumeFuel(FuelConsumptionRate);
-			const float Distance = MoveSpeed/1000.0f;
+			const float Distance = FMath::Abs(MoveAxisVector * MoveSpeed * GetWorld()->DeltaTimeSeconds)/100;
 			CurrentPlayerState->AddDistance(Distance);
 		}
 	}
