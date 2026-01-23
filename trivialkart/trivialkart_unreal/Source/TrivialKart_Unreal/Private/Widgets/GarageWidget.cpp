@@ -23,6 +23,8 @@ void UGarageWidget::NativeConstruct()
 void UGarageWidget::NativeDestruct()
 {
 	BackButton->OnClicked.RemoveDynamic(this, &UGarageWidget::OnBackButtonClicked);
+	KartCheckBox->OnCheckStateChanged.RemoveDynamic(this, &UGarageWidget::OnKartBoxStateChanged);
+	LevelCheckBox->OnCheckStateChanged.RemoveDynamic(this, &UGarageWidget::OnLevelBoxStateChange);
 	Super::NativeDestruct();
 }
 

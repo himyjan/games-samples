@@ -24,5 +24,5 @@ class TRIVIALKART_UNREAL_API USelectableItem : public UUserWidget
 	FButtonStyle SelectionButtonStyle;
 	
 public:
-	void NativePreConstruct();
+	void NativePreConstruct() override;
 };
