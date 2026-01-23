@@ -69,30 +69,48 @@ void UTrivialKartGameInstance::AddAchievementProgress(const float Progress, cons
 	}
 }
 
-void UTrivialKartGameInstance::StartPurchasing(FOnlineStoreOfferRef PurchaseItem, int32 Quantity)
+void UTrivialKartGameInstance::StartPurchasing(const FUniqueOfferId& PurchaseItemID, int32 Quantity)
 {
 	if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
 	{
 		if (const IOnlineIdentityPtr IdentityInterface = Subsystem->GetIdentityInterface())
 		{
-			if (const IOnlinePurchasePtr PurchaseInterface =
-				Subsystem->GetPurchaseInterface(); PurchaseInterface.IsValid())
+			if (const IOnlineStoreV2Ptr StoreV2Interface = Subsystem->GetStoreV2Interface())
 			{
-				if (PurchaseInterface->IsAllowedToPurchase(*IdentityInterface->GetUniquePlayerId(0)))
+				if (const TSharedPtr<FOnlineStoreOffer> CurrentOrder = StoreV2Interface->GetOffer(PurchaseItemID); 
+					CurrentOrder.IsValid())
 				{
-					FPurchaseCheckoutRequest CheckoutRequest;
+					if (const IOnlinePurchasePtr PurchaseInterface =
+						Subsystem->GetPurchaseInterface(); PurchaseInterface.IsValid())
+					{
+						if (PurchaseInterface->IsAllowedToPurchase(*IdentityInterface->GetUniquePlayerId(0)))
+						{
+							FPurchaseCheckoutRequest CheckoutRequest;
 
-					// Use the product ID from the Google Play Console (OfferId).
-					// Quantity is 1 for consumables, or can be 0 or 1 for non-consumables depending on platform and use.
-					CheckoutRequest.AddPurchaseOffer(
-						"", 
-						PurchaseItem->OfferId,
-						Quantity,
-						StoreListItemIDs[PurchaseItem->OfferId]
-					);
-					PurchaseInterface->Checkout(*IdentityInterface->GetUniquePlayerId(0),
-						CheckoutRequest,
-						FOnPurchaseCheckoutComplete::CreateUObject(this, &UTrivialKartGameInstance::OnCheckoutComplete));
+							// Use the product ID from the Google Play Console (OfferId).
+							CheckoutRequest.AddPurchaseOffer(
+								"", 
+								CurrentOrder->OfferId,
+								Quantity,
+								StoreListItemIDs[CurrentOrder->OfferId]
+							);
+							PurchaseInterface->Checkout(*IdentityInterface->GetUniquePlayerId(0),
+								CheckoutRequest,
+								FOnPurchaseCheckoutComplete::CreateWeakLambda(this, 
+									[this, Subsystem, IdentityInterface, PurchaseItemID, Quantity]
+									(const FOnlineError& OnlineError, const TSharedRef<FPurchaseReceipt>& PurchaseReceipt)
+								{
+									if (!OnlineError.WasSuccessful())
+										return;
+									if (OnPurchaseReceived.IsBound())
+									{
+										OnPurchaseReceived.Broadcast(PurchaseItemID, Quantity);
+									}
+									// The Purchase Token is passed as the ReceiptId to tell the platform which purchase to finalize (consume/acknowledge).
+									Subsystem->GetPurchaseInterface()->FinalizePurchase(*IdentityInterface->GetUniquePlayerId(0), PurchaseReceipt->TransactionId);
+								}));
+						}
+					}
 				}
 			}
 		}
@@ -145,28 +163,10 @@ void UTrivialKartGameInstance::OnQueryOnlineStoreOfferCompleted(bool bWasSuccess
 	{
 		if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
 		{
-			if (const IOnlineIdentityPtr IdentityInterface = Subsystem->GetIdentityInterface())
+			if (const IOnlineStoreV2Ptr StoreInterface = Subsystem->GetStoreV2Interface())
 			{
-				if (const IOnlineStoreV2Ptr StoreInterface = Subsystem->GetStoreV2Interface())
-				{
-					StoreInterface->GetOffers(StoreOffers);
-				}
+				StoreInterface->GetOffers(StoreOffers);
 			}
-		}
-	}
-}
-
-void UTrivialKartGameInstance::OnCheckoutComplete(const FOnlineError& OnlineError,
-                                                  const TSharedRef<FPurchaseReceipt>& PurchaseReceipt)
-{
-	if (!OnlineError.WasSuccessful())
-		return;
-	if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
-	{
-		if (const IOnlineIdentityPtr IdentityInterface = Subsystem->GetIdentityInterface())
-		{
-			// The Purchase Token is passed as the ReceiptId to tell the platform which purchase to finalize (consume/acknowledge).
-			Subsystem->GetPurchaseInterface()->FinalizePurchase(*IdentityInterface->GetUniquePlayerId(0), PurchaseReceipt->TransactionId);
 		}
 	}
 }

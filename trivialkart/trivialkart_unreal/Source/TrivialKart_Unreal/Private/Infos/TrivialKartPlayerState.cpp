@@ -14,6 +14,22 @@ void ATrivialKartPlayerState::BeginPlay()
 	
 	UpdateFuel();
 	UpdateDistance();
+	
+	if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
+			Instance.IsValid())
+	{
+		CoinPurchaseHandle = Instance->OnPurchaseReceived.AddUObject(this, &ATrivialKartPlayerState::OnPurchaseReceived);
+	}
+}
+
+void ATrivialKartPlayerState::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
+			Instance.IsValid())
+	{
+		Instance->OnPurchaseReceived.Remove(CoinPurchaseHandle);
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 void ATrivialKartPlayerState::ConsumeFuel(const float FuelConsumption)
@@ -63,4 +79,13 @@ void ATrivialKartPlayerState::UpdateFuel()
 void ATrivialKartPlayerState::UpdateDistance()
 {
 	OnDistanceUpdated.ExecuteIfBound(Distance);
+}
+
+void ATrivialKartPlayerState::OnPurchaseReceived(const FString& PurchaseItemID, int Quantity)
+{
+	if (PurchaseItemID == CoinItemID)
+	{
+		CoinCount += Quantity;
+		OnCoinUpdated.ExecuteIfBound(CoinCount);
+	}
 }

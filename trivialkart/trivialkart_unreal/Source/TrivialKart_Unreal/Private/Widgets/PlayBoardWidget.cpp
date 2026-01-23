@@ -18,6 +18,7 @@ void UPlayBoardWidget::NativeConstruct()
 	{
 		PlayerState->OnFuelUpdated.BindUObject(this, &UPlayBoardWidget::UpdateFuelBar);
 		PlayerState->OnDistanceUpdated.BindUObject(this, &UPlayBoardWidget::UpdateDistanceText);
+		PlayerState->OnCoinUpdated.BindUObject(this, &UPlayBoardWidget::UpdateCoinText);
 		const float FuelPercentage = PlayerState->GetFuel() / 100.0f;
 		UpdateFuelBar(FuelPercentage);
 		UpdateDistanceText(PlayerState->GetDistance());
@@ -34,6 +35,7 @@ void UPlayBoardWidget::NativeDestruct()
 	{
 		PlayerState->OnFuelUpdated.Unbind();
 		PlayerState->OnDistanceUpdated.Unbind();
+		PlayerState->OnCoinUpdated.Unbind();
 	}
 	Super::NativeDestruct();
 }
@@ -85,4 +87,9 @@ void UPlayBoardWidget::UpdateFuelBar(const float FuelBarPercentage) const
 void UPlayBoardWidget::UpdateDistanceText(const float Distance) const
 {
 	DistanceText->SetText(FText::FromString(FString::FromInt(FMath::RoundToInt(Distance))));
+}
+
+void UPlayBoardWidget::UpdateCoinText(const int Quantity) const
+{
+	CoinText->SetText(FText::FromString(FString::FromInt(Quantity)));
 }

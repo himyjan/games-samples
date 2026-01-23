@@ -8,6 +8,7 @@
 
 DECLARE_DELEGATE_OneParam(FDistanceUpdated, const float);
 DECLARE_DELEGATE_OneParam(FFuelUpdated, const float);
+DECLARE_DELEGATE_OneParam(FCoinUpdated, const int);
 
 /**
  * 
@@ -20,6 +21,8 @@ class TRIVIALKART_UNREAL_API ATrivialKartPlayerState : public APlayerState
 	float Fuel;
 	
 	float Distance;
+	
+	int CoinCount;
 	
 	UPROPERTY(EditAnywhere)
 	FString FuelAchievementName;
@@ -36,8 +39,14 @@ class TRIVIALKART_UNREAL_API ATrivialKartPlayerState : public APlayerState
 	UPROPERTY(EditAnywhere)
 	float DistanceAchievementThreshold;
 	
+	UPROPERTY(EditAnywhere)
+	FString CoinItemID;
+	
+	FDelegateHandle CoinPurchaseHandle;
+	
 public:
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	void ConsumeFuel(const float FuelConsumption);
 	void AddDistance(const float DistanceTravelled);
@@ -47,8 +56,12 @@ public:
 	
 	FDistanceUpdated OnDistanceUpdated;
 	FFuelUpdated OnFuelUpdated;
+	FCoinUpdated OnCoinUpdated;
 	
 private:
 	void UpdateFuel();
 	void UpdateDistance();
+	
+	UFUNCTION()
+	void OnPurchaseReceived(const FString& PurchaseItemID, int Quantity);
 };

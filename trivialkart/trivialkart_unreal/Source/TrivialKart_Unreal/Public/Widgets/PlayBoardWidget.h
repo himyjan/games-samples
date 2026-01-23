@@ -40,7 +40,10 @@ private:
 	UFUNCTION()
 	void OnStoreButtonClicked();
 	
-public:
+	UFUNCTION()
 	void UpdateFuelBar(const float FuelBarPercentage) const;
+	UFUNCTION()
 	void UpdateDistanceText(const float Distance) const;
+	UFUNCTION()
+	void UpdateCoinText(const int Quantity) const;
 };

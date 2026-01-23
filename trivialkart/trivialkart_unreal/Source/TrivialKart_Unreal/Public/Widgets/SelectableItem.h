@@ -6,6 +6,13 @@
 #include "Blueprint/UserWidget.h"
 #include "SelectableItem.generated.h"
 
+
+UENUM()
+enum class ESelectableOperationType : uint8
+{
+	None,
+	Purchase
+};
 class UButtonWidgetStyle;
 class UButton;
 class SButton;
@@ -23,6 +30,20 @@ class TRIVIALKART_UNREAL_API USelectableItem : public UUserWidget
 	UPROPERTY(EditAnywhere)
 	FButtonStyle SelectionButtonStyle;
 	
+	UPROPERTY(EditAnywhere)
+	ESelectableOperationType SelectionOperationType;
+	
+	UPROPERTY(EditAnywhere)
+	FString PurchaseID;
+	
+	UPROPERTY(EditAnywhere)
+	int PurchaseQuantity;
+	
 public:
 	void NativePreConstruct() override;
+	void NativeConstruct() override;
+	void NativeDestruct() override;
+	
+	UFUNCTION()
+	void OnSelectionButtonClicked();
 };

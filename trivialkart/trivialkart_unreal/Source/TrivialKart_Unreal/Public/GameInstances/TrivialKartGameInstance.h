@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintPlatformLibrary.h"
 #include "TrivialKartGameInstance.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPurchase, const FUniqueOfferId&, const int);
 class FPurchaseReceipt;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateGameInstance, Log, All);
 /**
@@ -17,6 +18,8 @@ class TRIVIALKART_UNREAL_API UTrivialKartGameInstance : public UPlatformGameInst
 	GENERATED_BODY()
 	
 public:
+	FOnPurchase OnPurchaseReceived;
+	
 	virtual void Init() override;
 	
 	UFUNCTION(BlueprintCallable, Category = "GameInstance|Authentication")
@@ -29,7 +32,7 @@ public:
 	FString GetPlayerName() const;
 	
 	void AddAchievementProgress(const float Progress, const FString& AchievementName, const FString& AchievementID);
-	void StartPurchasing(FOnlineStoreOfferRef PurchaseItem, int32 Quantity);
+	void StartPurchasing(const FString& OfferID, const int32 Quantity);
 	
 protected:
 	//A map for ID and if they are Consumable Purchased
@@ -51,7 +54,5 @@ private:
 	void OnQueryAchievementsCompleted(const FUniqueNetId& UniqueNetId, bool bWasSuccessful);
 	
 	void OnQueryOnlineStoreOfferCompleted(bool bWasSuccessful, const TArray<FUniqueOfferId>& OfferIds, const FString& Error);
-	
-	void OnCheckoutComplete(const FOnlineError& OnlineError, const TSharedRef<FPurchaseReceipt>& PurchaseReceipt);
 	
 };
