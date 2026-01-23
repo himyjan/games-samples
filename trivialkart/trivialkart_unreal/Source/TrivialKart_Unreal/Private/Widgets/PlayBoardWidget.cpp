@@ -68,5 +68,5 @@ void UPlayBoardWidget::UpdateFuelBar(const float FuelBarPercentage) const
 
 void UPlayBoardWidget::UpdateDistanceText(const float Distance) const
 {
-	DistanceText->SetText(FText::FromString(FString::FromInt(Distance)));
+DistanceText->SetText(FText::FromString(FString::FromInt(FMath::RoundToInt(Distance))));
 }
