@@ -3,9 +3,7 @@
 
 #include "Infos/TrivialKartPlayerState.h"
 
-#include "Actors/TrivialKartHUD.h"
 #include "GameInstances/TrivialKartGameInstance.h"
-#include "Widgets/PlayBoardWidget.h"
 
 void ATrivialKartPlayerState::BeginPlay()
 {
@@ -51,35 +49,18 @@ float ATrivialKartPlayerState::GetFuel() const
 	return Fuel;
 }
 
+float ATrivialKartPlayerState::GetDistance() const
+{
+	return Distance;
+}
+
 void ATrivialKartPlayerState::UpdateFuel()
 {
-	if (TWeakObjectPtr CurrentController = GetPlayerController(); CurrentController.IsValid())
-	{
-		if (TWeakObjectPtr CurrentHUD = Cast<ATrivialKartHUD>(
-			GetPlayerController()->GetHUD()); CurrentHUD.IsValid())
-		{
-			if (TWeakObjectPtr Widget = Cast<UPlayBoardWidget>(
-				CurrentHUD->GetWidgetOfType(EWidgetType::PlayBoard)); Widget.IsValid())
-			{
-				const float FuelPercentage = Fuel / 100.0f;
-				Widget->UpdateFuelBar(FuelPercentage);
-			}
-		}
-	}
+	const float FuelPercentage = Fuel / 100.0f;
+	OnFuelUpdated.ExecuteIfBound(FuelPercentage);
 }
 
 void ATrivialKartPlayerState::UpdateDistance()
 {
-	if (TWeakObjectPtr CurrentController = GetPlayerController(); CurrentController.IsValid())
-	{
-		if (TWeakObjectPtr CurrentHUD = Cast<ATrivialKartHUD>(
-			GetPlayerController()->GetHUD()); CurrentHUD.IsValid())
-		{
-			if (TWeakObjectPtr Widget = Cast<UPlayBoardWidget>(
-				CurrentHUD->GetWidgetOfType(EWidgetType::PlayBoard)); Widget.IsValid())
-			{
-				Widget->UpdateDistanceText(Distance);
-			}
-		}
-	}
+	OnDistanceUpdated.ExecuteIfBound(Distance);
 }

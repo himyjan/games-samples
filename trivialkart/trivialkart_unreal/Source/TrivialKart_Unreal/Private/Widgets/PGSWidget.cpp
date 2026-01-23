@@ -57,7 +57,7 @@ void UPGSWidget::NativeConstruct()
 					if (auto PGSText = Cast<UPGSLayoutText>(
 							CreateWidget(this, PGSTextTemplate)))
 					{
-PGSText->SetPGSText(Achievement.Id, FString::Printf(TEXT("%.1f"), Achievement.Progress));
+						PGSText->SetPGSText(Achievement.Id, FString::Printf(TEXT("%.1f"), Achievement.Progress));
 						AchievementsBox->AddChild(PGSText);
 					}
 				}

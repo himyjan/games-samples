@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerState.h"
 #include "TrivialKartPlayerState.generated.h"
 
+DECLARE_DELEGATE_OneParam(FDistanceUpdated, const float);
+DECLARE_DELEGATE_OneParam(FFuelUpdated, const float);
+
 /**
  * 
  */
@@ -40,6 +43,10 @@ public:
 	void AddDistance(const float DistanceTravelled);
 	
 	float GetFuel() const;
+	float GetDistance() const;
+	
+	FDistanceUpdated OnDistanceUpdated;
+	FFuelUpdated OnFuelUpdated;
 	
 private:
 	void UpdateFuel();
