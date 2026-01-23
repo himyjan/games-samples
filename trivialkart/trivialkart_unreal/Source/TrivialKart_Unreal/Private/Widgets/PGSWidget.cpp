@@ -22,23 +22,25 @@ void UPGSWidget::NativeConstruct()
 	CheckBoxes.Empty();
 	CheckBoxes.Add(AuthenticationCheckBox);
 	CheckBoxes.Add(AchievementsCheckBox);
+	CheckBoxes.Add(LeaderboardCheckBox);
 	AuthenticationCheckBox->OnCheckStateChanged.AddUniqueDynamic(this, &UPGSWidget::OnAuthCheckBoxStateChanged);
 	AchievementsCheckBox->OnCheckStateChanged.AddUniqueDynamic(this, &UPGSWidget::OnAchievementBoxStateChange);
+	LeaderboardCheckBox->OnCheckStateChanged.AddUniqueDynamic(this, &UPGSWidget::OnLeaderboardBoxStateChange);
 	if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
 		Instance.IsValid())
 	{
-		FString AuthStatus = Instance->GetLoginStatus() ? FString("Logged In") : FString("Logged Out");
-		if (auto PGSAuthStatusText = Cast<UPGSLayoutText>(
+		const FString AuthStatus = Instance->GetLoginStatus() ? FString("Logged In") : FString("Logged Out");
+		if (const auto PgsAuthStatusText = Cast<UPGSLayoutText>(
 							CreateWidget(this, PGSTextTemplate)))
 		{
-			PGSAuthStatusText->SetPGSText("Auth Status", AuthStatus);
-			AuthBox->AddChild(PGSAuthStatusText);
+			PgsAuthStatusText->SetPGSText("Auth Status", AuthStatus);
+			AuthBox->AddChildToVerticalBox(PgsAuthStatusText);
 		}
-		if (auto PGSUsernameText = Cast<UPGSLayoutText>(
+		if (const auto PgsUsernameText = Cast<UPGSLayoutText>(
 							CreateWidget(this, PGSTextTemplate)))
 		{
-			PGSUsernameText->SetPGSText("Username", Instance->GetPlayerName());
-			AuthBox->AddChild(PGSUsernameText);
+			PgsUsernameText->SetPGSText("Username", Instance->GetPlayerName());
+			AuthBox->AddChildToVerticalBox(PgsUsernameText);
 		}
 	}
 	if (const IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(GetWorld()); 
@@ -71,6 +73,7 @@ void UPGSWidget::NativeDestruct()
 	BackButton->OnClicked.RemoveDynamic(this, &UPGSWidget::OnBackButtonClicked);
 	AuthenticationCheckBox->OnCheckStateChanged.RemoveDynamic(this, &UPGSWidget::OnAuthCheckBoxStateChanged);
 	AchievementsCheckBox->OnCheckStateChanged.RemoveDynamic(this, &UPGSWidget::OnAchievementBoxStateChange);
+	LeaderboardCheckBox->OnCheckStateChanged.RemoveDynamic(this, &UPGSWidget::OnLeaderboardBoxStateChange);
 	Super::NativeDestruct();
 }
 
@@ -116,4 +119,9 @@ void UPGSWidget::OnAuthCheckBoxStateChanged(bool bIsChecked)
 void UPGSWidget::OnAchievementBoxStateChange(bool bIsChecked)
 {
 	SetCheckBoxState(bIsChecked, AchievementsCheckBox, 1);
+}
+
+void UPGSWidget::OnLeaderboardBoxStateChange(bool bIsChecked)
+{
+	SetCheckBoxState(bIsChecked, LeaderboardCheckBox, 2);
 }

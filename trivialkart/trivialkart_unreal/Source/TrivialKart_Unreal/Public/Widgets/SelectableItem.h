@@ -40,9 +40,9 @@ class TRIVIALKART_UNREAL_API USelectableItem : public UUserWidget
 	int PurchaseQuantity;
 	
 public:
-	void NativePreConstruct() override;
-	void NativeConstruct() override;
-	void NativeDestruct() override;
+	virtual void NativePreConstruct() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	
 	UFUNCTION()
 	void OnSelectionButtonClicked();

@@ -33,8 +33,8 @@ protected:
 	UPROPERTY()
 	TArray<UCheckBox*> CheckBoxes;
 public:
-	void NativeConstruct() override;
-	void NativeDestruct() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	
 private:
 	UFUNCTION()

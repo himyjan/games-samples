@@ -31,6 +31,9 @@ class TRIVIALKART_UNREAL_API UPGSWidget : public UUserWidget
 	TObjectPtr<UCheckBox> AchievementsCheckBox;
 	
 	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UCheckBox> LeaderboardCheckBox;
+	
+	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UWidgetSwitcher> ContentSwitcher;
 	
 	UPROPERTY(meta=(BindWidget))
@@ -39,6 +42,9 @@ class TRIVIALKART_UNREAL_API UPGSWidget : public UUserWidget
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UScrollBox> AchievementsBox;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UScrollBox> LeaderboardBox;
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UPGSLayoutText> PGSTextTemplate;
 	
@@ -46,8 +52,8 @@ protected:
 	UPROPERTY()
 	TArray<UCheckBox*> CheckBoxes;
 public:
-	void NativeConstruct() override;
-	void NativeDestruct() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	
 private:
 	UFUNCTION()
@@ -57,4 +63,6 @@ private:
 	void OnAuthCheckBoxStateChanged(bool bIsChecked);
 	UFUNCTION()
 	void OnAchievementBoxStateChange(bool bIsChecked);
+	UFUNCTION()
+	void OnLeaderboardBoxStateChange(bool bIsChecked);
 };
