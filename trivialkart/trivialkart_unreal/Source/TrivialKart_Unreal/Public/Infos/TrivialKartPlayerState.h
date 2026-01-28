@@ -57,7 +57,7 @@ class TRIVIALKART_UNREAL_API ATrivialKartPlayerState : public APlayerState
 	float DistanceAchievementThreshold;
 	
 	UPROPERTY(EditAnywhere)
-	FString CoinItemID;
+	TArray<FString> CoinOfferIDs;
 	
 	FDelegateHandle CoinPurchaseHandle;
 	

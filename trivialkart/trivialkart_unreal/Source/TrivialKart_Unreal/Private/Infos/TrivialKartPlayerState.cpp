@@ -161,7 +161,7 @@ void ATrivialKartPlayerState::UpdateCoin()
 
 void ATrivialKartPlayerState::OnPurchaseReceived(const FString& PurchaseItemID, int Quantity)
 {
-	if (PurchaseItemID == CoinItemID)
+	if (CoinOfferIDs.Contains(PurchaseItemID))
 	{
 		CoinCount += Quantity;
 		UpdateCoin();
