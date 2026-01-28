@@ -1,4 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Copyright 2026 The Android Open Source Project
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
 
 #pragma once
 
@@ -23,6 +37,9 @@ class TRIVIALKART_UNREAL_API ATrivialKartPlayerState : public APlayerState
 	float Distance;
 	
 	int CoinCount;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FString> CarsOwned;
 	
 	UPROPERTY(EditAnywhere)
 	FString FuelAchievementName;
@@ -50,17 +67,27 @@ public:
 	
 	void ConsumeFuel(const float FuelConsumption);
 	void AddDistance(const float DistanceTravelled);
+	void ConsumeCoins(const int CoinsUsed);
+	void AddCarToInventory(const FString& CarID);
 	
 	float GetFuel() const;
 	float GetDistance() const;
+	int GetCoinCount() const;
+	
+	void Refuel();
 	
 	FDistanceUpdated OnDistanceUpdated;
 	FFuelUpdated OnFuelUpdated;
 	FCoinUpdated OnCoinUpdated;
 	
+#if UE_EDITOR
+	void AddCoins(int CoinQuantity);
+#endif
+	
 private:
 	void UpdateFuel();
 	void UpdateDistance();
+	void UpdateCoin();
 	
 	UFUNCTION()
 	void OnPurchaseReceived(const FString& PurchaseItemID, int Quantity);

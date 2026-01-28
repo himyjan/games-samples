@@ -15,7 +15,5 @@
  */
 
 
-#pragma once
-
-#include "CoreMinimal.h"
+#include "Objects/TrivialKartSaveGame.h"
 

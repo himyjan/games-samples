@@ -1,3 +1,20 @@
+/*
+* Copyright 2026 The Android Open Source Project
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
+
 #include "GameInstances/TrivialKartGameInstance.h"
 
 #include "OnlineSubsystem.h"
@@ -5,6 +22,8 @@
 #include "Interfaces/OnlineAchievementsInterface.h"
 #include "Interfaces/OnlineIdentityInterface.h"
 #include "Interfaces/OnlinePurchaseInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Objects/TrivialKartSaveGame.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateGameInstance);
 
@@ -69,7 +88,7 @@ void UTrivialKartGameInstance::AddAchievementProgress(const float Progress, cons
 	}
 }
 
-void UTrivialKartGameInstance::StartPurchasing(const FUniqueOfferId& PurchaseItemID, int32 Quantity)
+void UTrivialKartGameInstance::StartPurchasing(const FUniqueOfferId& PurchaseItemID, int32 Quantity, bool bIsConsumable)
 {
 	if (const IOnlineSubsystem* Subsystem = Online::GetSubsystem(GetWorld()))
 	{
@@ -92,7 +111,7 @@ void UTrivialKartGameInstance::StartPurchasing(const FUniqueOfferId& PurchaseIte
 								"", 
 								CurrentOrder->OfferId,
 								Quantity,
-								StoreListItemIDs[CurrentOrder->OfferId]
+								bIsConsumable
 							);
 							PurchaseInterface->Checkout(*IdentityInterface->GetUniquePlayerId(0),
 								CheckoutRequest,
@@ -117,6 +136,23 @@ void UTrivialKartGameInstance::StartPurchasing(const FUniqueOfferId& PurchaseIte
 	}
 }
 
+UTrivialKartSaveGame* UTrivialKartGameInstance::LoadGame()
+{
+	SaveGameInstance = Cast<UTrivialKartSaveGame>(UGameplayStatics::LoadGameFromSlot("TrivialKart", 0));
+	if (!IsValid(SaveGameInstance))
+	{
+		SaveGameInstance = Cast<UTrivialKartSaveGame>(UGameplayStatics::CreateSaveGameObject(SaveGameTemplate));
+	}
+	return SaveGameInstance;
+}
+
+void UTrivialKartGameInstance::SaveGame(UTrivialKartSaveGame* SaveData)
+{
+	if (!IsValid(SaveData))
+		return;
+	UGameplayStatics::SaveGameToSlot(SaveData, "TrivialKart", 0);
+}
+
 void UTrivialKartGameInstance::OnLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId,
                                                 const FString& Error)
 {
@@ -137,9 +173,7 @@ UE_LOG(LogTemplateGameInstance, Log, TEXT("Local User: %d of Unique ID: %s has l
 				}
 				if (const IOnlineStoreV2Ptr StoreInterface = Subsystem->GetStoreV2Interface())
 				{
-					TArray<FString> StoreListItemKeys;
-					StoreListItemIDs.GetKeys(StoreListItemKeys);
-					StoreInterface->QueryOffersById(*IdentityInterface->GetUniquePlayerId(0), StoreListItemKeys, 
+					StoreInterface->QueryOffersById(*IdentityInterface->GetUniquePlayerId(0), StoreListItemIDs, 
 						FOnQueryOnlineStoreOffersComplete::CreateUObject(this, &UTrivialKartGameInstance::OnQueryOnlineStoreOfferCompleted));
 				}
 			}
@@ -149,7 +183,7 @@ UE_LOG(LogTemplateGameInstance, Log, TEXT("Local User: %d of Unique ID: %s has l
 
 void UTrivialKartGameInstance::OnQueryAchievementsCompleted(const FUniqueNetId& UniqueNetId, bool bWasSuccessful)
 {
-UE_LOG(LogTemplateGameInstance, Log, TEXT("Achievements Cached for User: %s has %s"), *UniqueNetId.ToString(), bWasSuccessful ? TEXT("Succeeded") : TEXT("Failed"));
+	UE_LOG(LogTemplateGameInstance, Log, TEXT("Achievements Cached for User: %s has %s"), *UniqueNetId.ToString(), bWasSuccessful ? TEXT("Succeeded") : TEXT("Failed"));
 	if (bWasSuccessful)
 	{
 		AddAchievementProgress(20, LogInAchievementID, LogInAchievementName);

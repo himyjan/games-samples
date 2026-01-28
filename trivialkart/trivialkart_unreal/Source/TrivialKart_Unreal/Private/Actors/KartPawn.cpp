@@ -1,16 +1,32 @@
+/*
+* Copyright 2026 The Android Open Source Project
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
+
 #include "Actors/KartPawn.h"
 
 #include "EnhancedInputComponent.h"
-#include "PaperCharacter.h"
 #include "PaperFlipbookComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameInstances/TrivialKartGameInstance.h"
 #include "Infos/TrivialKartPlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Objects/TrivialKartSaveGame.h"
 
 // Sets default values
 AKartPawn::AKartPawn()
@@ -55,7 +71,14 @@ AKartPawn::AKartPawn()
 void AKartPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (const TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
+						Instance.IsValid())
+	{
+		if (TWeakObjectPtr Save = Instance->LoadGame(); Save.IsValid())
+		{
+			SwitchCar(Save->ActiveCarType);
+		}
+	}
 }
 
 void AKartPawn::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -79,9 +102,17 @@ void AKartPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) 
-		{
+	{
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AKartPawn::Move);
+	}
+}
+
+void AKartPawn::SwitchCar(const FString& CarName)
+{
+	if (CarTypes.Contains(CarName))
+	{
+		Sprite->SetFlipbook(CarTypes[CarName]);
 	}
 }
 

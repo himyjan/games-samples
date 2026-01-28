@@ -1,3 +1,20 @@
+/*
+* Copyright 2026 The Android Open Source Project
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -6,6 +23,8 @@
 #include "Kismet/BlueprintPlatformLibrary.h"
 #include "TrivialKartGameInstance.generated.h"
 
+class USaveGame;
+class UTrivialKartSaveGame;
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPurchase, const FUniqueOfferId&, const int);
 class FPurchaseReceipt;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateGameInstance, Log, All);
@@ -32,12 +51,14 @@ public:
 	FString GetPlayerName() const;
 	
 	void AddAchievementProgress(const float Progress, const FString& AchievementName, const FString& AchievementID);
-	void StartPurchasing(const FString& OfferID, const int32 Quantity);
+	void StartPurchasing(const FString& OfferID, const int32 Quantity, bool bIsConsumable);
+	
+	UTrivialKartSaveGame* LoadGame();
+	void SaveGame(UTrivialKartSaveGame* SaveData);
 	
 protected:
-	//A map for ID and if they are Consumable Purchased
 	UPROPERTY(EditAnywhere)
-	TMap<FString, bool> StoreListItemIDs;
+	TArray<FString> StoreListItemIDs;
 	
 	TArray<FOnlineStoreOfferRef> StoreOffers;
 	
@@ -46,6 +67,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	FString LogInAchievementID;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USaveGame> SaveGameTemplate;
+	
+	UPROPERTY()
+	UTrivialKartSaveGame* SaveGameInstance;
 	
 private:
 	void OnLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId,

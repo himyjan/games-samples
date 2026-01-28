@@ -14,8 +14,28 @@
  *   limitations under the License.
  */
 
-
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/SaveGame.h"
+#include "TrivialKartSaveGame.generated.h"
 
+/**
+ * 
+ */
+UCLASS()
+class TRIVIALKART_UNREAL_API UTrivialKartSaveGame : public USaveGame
+{
+	GENERATED_BODY()
+	
+public:
+	UPROPERTY(EditAnywhere)
+	int CurrentCoins;
+	
+	UPROPERTY(EditAnywhere)
+	TArray<FString> CarsOwned;
+	
+	UPROPERTY(EditAnywhere)
+	FString ActiveCarType;
+	
+};
