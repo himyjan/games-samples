@@ -60,7 +60,7 @@ void ATrivialKartPlayerState::ConsumeFuel(const float FuelConsumption)
 		if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
 			Instance.IsValid())
 		{
-			Instance->AddAchievementProgress(100, FuelAchievementName, FuelAchievementID);
+			Instance->AddAchievementProgress(100, FuelAchievementName);
 		}
 	}
 }
@@ -74,7 +74,7 @@ void ATrivialKartPlayerState::AddDistance(const float DistanceTravelled)
 		if (TWeakObjectPtr Instance = Cast<UTrivialKartGameInstance>(GetGameInstance()); 
 			Instance.IsValid())
 		{
-			Instance->AddAchievementProgress(100, DistanceAchievementName, DistanceAchievementID);
+			Instance->AddAchievementProgress(100, DistanceAchievementName);
 		}
 	}
 }

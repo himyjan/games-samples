@@ -50,7 +50,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameInstance|Authentication")
 	FString GetPlayerName() const;
 	
-	void AddAchievementProgress(const float Progress, const FString& AchievementName, const FString& AchievementID);
+	void AddAchievementProgress(const float Progress, const FString& AchievementName);
 	void StartPurchasing(const FString& OfferID, const int32 Quantity, bool bIsConsumable);
 	
 	UTrivialKartSaveGame* LoadGame();
@@ -64,9 +64,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	FString LogInAchievementName;
-	
-	UPROPERTY(EditAnywhere)
-	FString LogInAchievementID;
 	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<USaveGame> SaveGameTemplate;

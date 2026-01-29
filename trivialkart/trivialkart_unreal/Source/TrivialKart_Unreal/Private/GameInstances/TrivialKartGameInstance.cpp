@@ -62,10 +62,9 @@ FString UTrivialKartGameInstance::GetPlayerName() const
 	return FString();
 }
 
-void UTrivialKartGameInstance::AddAchievementProgress(const float Progress, const FString& AchievementName,
-	const FString& AchievementID)
+void UTrivialKartGameInstance::AddAchievementProgress(const float Progress, const FString& AchievementName)
 {
-	if (AchievementName.IsEmpty() && AchievementID.IsEmpty())
+	if (AchievementName.IsEmpty())
 		return;
 	if (const IOnlineIdentityPtr IdentityInterface = Online::GetIdentityInterface(GetWorld()); 
 		IdentityInterface.IsValid())
@@ -74,7 +73,7 @@ void UTrivialKartGameInstance::AddAchievementProgress(const float Progress, cons
 			Online::GetAchievementsInterface(GetWorld()); AchievementsInterface.IsValid())
 		{
 			FOnlineAchievement CurrentAchievement;
-			AchievementsInterface->GetCachedAchievement(*IdentityInterface->GetUniquePlayerId(0),AchievementID, CurrentAchievement);
+			AchievementsInterface->GetCachedAchievement(*IdentityInterface->GetUniquePlayerId(0), AchievementName, CurrentAchievement);
 			if (CurrentAchievement.Progress < 100.0)
 			{
 				const float CurrentProgress = CurrentAchievement.Progress + Progress;
@@ -186,7 +185,7 @@ void UTrivialKartGameInstance::OnQueryAchievementsCompleted(const FUniqueNetId& 
 	UE_LOG(LogTemplateGameInstance, Log, TEXT("Achievements Cached for User: %s has %s"), *UniqueNetId.ToString(), bWasSuccessful ? TEXT("Succeeded") : TEXT("Failed"));
 	if (bWasSuccessful)
 	{
-		AddAchievementProgress(20, LogInAchievementName, LogInAchievementID);
+		AddAchievementProgress(20, LogInAchievementName);
 	}
 }
 

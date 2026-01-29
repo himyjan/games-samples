@@ -116,7 +116,7 @@ void AKartPawn::SwitchCar(const FString& CarName)
 	}
 }
 
-void AKartPawn::Move(const FInputActionValue& Value)
+void AKartPawn::Move()
 {
 	if (GetController() != nullptr)
 	{
@@ -125,11 +125,10 @@ void AKartPawn::Move(const FInputActionValue& Value)
 		{
 			if (CurrentPlayerState->GetFuel() <= 0.0f)
 				return;
-			float MoveAxisVector = Value.Get<float>();
-			AddActorLocalOffset(FVector(MoveAxisVector * MoveSpeed * GetWorld()->DeltaTimeSeconds, 0.0f, 0.0f));
+			AddActorLocalOffset(FVector(MoveSpeed * GetWorld()->DeltaTimeSeconds, 0.0f, 0.0f));
 		
 			CurrentPlayerState->ConsumeFuel(FuelConsumptionRate);
-			const float Distance = FMath::Abs(MoveAxisVector * MoveSpeed * GetWorld()->DeltaTimeSeconds)/100;
+			const float Distance = FMath::Abs(MoveSpeed * GetWorld()->DeltaTimeSeconds)/100;
 			CurrentPlayerState->AddDistance(Distance);
 		}
 	}

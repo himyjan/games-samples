@@ -74,6 +74,6 @@ public:
 	void SwitchCar(const FString& CarName);
 	
 protected:
-	virtual void Move(const FInputActionValue& Value);
+	virtual void Move();
 
 };

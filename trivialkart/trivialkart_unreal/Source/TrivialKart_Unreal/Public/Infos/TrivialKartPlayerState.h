@@ -45,9 +45,6 @@ class TRIVIALKART_UNREAL_API ATrivialKartPlayerState : public APlayerState
 	FString FuelAchievementName;
 	
 	UPROPERTY(EditAnywhere)
-	FString FuelAchievementID;
-	
-	UPROPERTY(EditAnywhere)
 	FString DistanceAchievementName;
 	
 	UPROPERTY(EditAnywhere)
