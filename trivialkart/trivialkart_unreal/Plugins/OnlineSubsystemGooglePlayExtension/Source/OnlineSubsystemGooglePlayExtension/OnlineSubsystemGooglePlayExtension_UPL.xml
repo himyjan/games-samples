@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+*	Copyright 2026 The Android Open Source Project
+*
+*   Licensed under the Apache License, Version 2.0 (the "License");
+*   you may not use this file except in compliance with the License.
+*   You may obtain a copy of the License at
+*
+*		https://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*   See the License for the specific language governing permissions and
+*   limitations under the License.
+-->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+	<init>
+		<log text="GooglePlayExtension UPL Init"/>
+	</init>
+
+	<buildGradleAdditions>
+		<insert>
+			dependencies {
+			implementation "com.google.android.gms:play-services-games-v2:20.1.2"
+			implementation "com.google.android.gms:play-services-tasks:18.0.2"
+			}
+		</insert>
+	</buildGradleAdditions>
+
+	<gameActivityImportAdditions>
+		<insert>
+			import com.google.android.gms.games.PlayGames;
+			import com.google.android.gms.games.SnapshotsClient;
+			import com.google.android.gms.games.snapshot.Snapshot;
+			import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
+			import java.io.IOException;
+			import com.google.android.gms.games.PlayersClient;
+			import com.google.android.gms.games.Player;
+			import com.google.android.gms.games.PlayerBuffer;
+			import com.google.android.gms.games.FriendsResolutionRequiredException;
+			import android.app.PendingIntent;
+			import android.content.IntentSender;
+			import android.content.Intent;
+			import android.app.Activity;
+			import com.google.android.gms.games.PlayerStatsClient;
+			import com.google.android.gms.games.stats.PlayerStats;
+			import com.google.android.gms.games.EventsClient;
+		</insert>
+	</gameActivityImportAdditions>
+
+	<gameActivityClassAdditions>
+		<insert>
+			// --- Google Play V2 Extension Start ---
+
+			// Native Callbacks (Belong to GameActivity now)
+			public native void nativeOnGPGSaveComplete(long taskPtr, boolean success, String msg);
+			public native void nativeOnGPGLoadComplete(long taskPtr, boolean success, byte[] data, String msg);
+			
+			public native void nativeOnRecallIdReceived(long taskPtr, boolean success, String sessionId, String errorMsg);
+
+			public native void nativeOnReadFriendsListComplete(long taskPtr, boolean success, String errorMsg, String[] friendIds, String[] friendNames, String[] friendAvatars);
+			
+			public native void nativeOnProfileUIClosed(long taskPtr);
+			
+			public native void nativeOnPlayerStatsReceived(long taskPtr, boolean bSuccess, String errorMsg,
+			float avgSessionLength, int daysSinceLastPlayed, int numPurchases, int numSessions,
+			float sessionPercentile, float spendPercentile);
+
+			// Save Thunk
+			public void AndroidThunkJava_GPGSaveSnapshot(long taskPtr, String fileName, byte[] data) {
+			PlayGames.getSnapshotsClient(this)
+			.open(fileName, true, SnapshotsClient.RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED)
+			.addOnSuccessListener(dataOrConflict -> {
+			Snapshot snapshot = dataOrConflict.isConflict() ? dataOrConflict.getConflict().getSnapshot() : dataOrConflict.getData();
+			if (snapshot != null) {
+			snapshot.getSnapshotContents().writeBytes(data);
+			SnapshotMetadataChange change = new SnapshotMetadataChange.Builder().setDescription("UE5 Save").build();
+			PlayGames.getSnapshotsClient(this).commitAndClose(snapshot, change)
+			.addOnSuccessListener(res -> nativeOnGPGSaveComplete(taskPtr, true, "Saved"))
+			.addOnFailureListener(e -> nativeOnGPGSaveComplete(taskPtr, false, e.toString()));
+			}
+			})
+			.addOnFailureListener(e -> nativeOnGPGSaveComplete(taskPtr, false, "Open Failed"));
+			}
+
+			// Load Thunk
+			public void AndroidThunkJava_GPGLoadSnapshot(long taskPtr, String fileName) {
+			PlayGames.getSnapshotsClient(this)
+			.open(fileName, false, SnapshotsClient.RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED)
+			.addOnSuccessListener(dataOrConflict -> {
+			Snapshot snapshot = dataOrConflict.isConflict() ? dataOrConflict.getConflict().getSnapshot() : dataOrConflict.getData();
+			if (snapshot != null) {
+			try {
+			byte[] data = snapshot.getSnapshotContents().readFully();
+			nativeOnGPGLoadComplete(taskPtr, true, data, "Loaded");
+			} catch (IOException e) {
+			nativeOnGPGLoadComplete(taskPtr, false, null, "Read Error");
+			}
+			}
+			})
+			.addOnFailureListener(e -> nativeOnGPGLoadComplete(taskPtr, false, null, "Open Failed"));
+			}
+
+			public void AndroidThunkJava_GetRecallSessionId(long taskPtr) {
+			PlayGames.getRecallClient(this).requestRecallAccess()
+			.addOnSuccessListener(recallAccess -> {
+			nativeOnRecallIdReceived(taskPtr, true, recallAccess.getSessionId(), "");
+			})
+			.addOnFailureListener(e -> {
+			nativeOnRecallIdReceived(taskPtr, false, "", e.toString());
+			});
+			}
+
+			// Variables to hold state during the consent popup
+			private long pendingFriendsTaskPtr = 0;
+			private static final int SHOW_SHARING_FRIENDS_CONSENT = 90001;
+
+			// Entry point called by C++
+			public void AndroidThunkJava_ReadFriendsList(long taskPtr) {
+			pendingFriendsTaskPtr = taskPtr;
+			DoLoadFriends();
+			}
+
+			// Actual load logic (separated so we can retry after consent)
+			private void DoLoadFriends() {
+			PlayGames.getPlayersClient(this).loadFriends(100, false)
+			.addOnSuccessListener(annotatedData -> {
+			PlayerBuffer buffer = annotatedData.get();
+			int count = (buffer != null) ? buffer.getCount() : 0;
+
+			String[] ids = new String[count];
+			String[] names = new String[count];
+			String[] avatars = new String[count];
+
+			if (buffer != null) {
+			// NOTE: &lt; is used instead of less-than symbol to prevent XML parsing errors
+			for (int i = 0; i &lt; count; i++) {
+			Player player = buffer.get(i);
+			ids[i] = player.getPlayerId();
+			names[i] = player.getDisplayName();
+			avatars[i] = (player.hasIconImage() &amp;&amp; player.getIconImageUri() != null) ? player.getIconImageUri().toString() : "";
+			}
+			buffer.release();
+			}
+
+			if (pendingFriendsTaskPtr != 0) {
+			nativeOnReadFriendsListComplete(pendingFriendsTaskPtr, true, "", ids, names, avatars);
+			pendingFriendsTaskPtr = 0; // Reset
+			}
+			})
+			.addOnFailureListener(exception -> {
+			if (exception instanceof FriendsResolutionRequiredException) {
+			try {
+			PendingIntent pendingIntent = ((FriendsResolutionRequiredException) exception).getResolution();
+			// Show the Google UI
+			startIntentSenderForResult(
+			pendingIntent.getIntentSender(),
+			SHOW_SHARING_FRIENDS_CONSENT,
+			null, 0, 0, 0
+			);
+			} catch (IntentSender.SendIntentException e) {
+			if (pendingFriendsTaskPtr != 0) {
+			nativeOnReadFriendsListComplete(pendingFriendsTaskPtr, false, "IntentSender failed: " + e.toString(), null, null, null);
+			pendingFriendsTaskPtr = 0;
+			}
+			}
+			} else {
+			// Standard failure
+			if (pendingFriendsTaskPtr != 0) {
+			nativeOnReadFriendsListComplete(pendingFriendsTaskPtr, false, exception.toString(), null, null, null);
+			pendingFriendsTaskPtr = 0;
+			}
+			}
+			});
+			}
+
+			// --- External UI Interface Start ---
+			private static final int RC_SHOW_PROFILE = 90002;
+			private long pendingProfileTaskPtr = 0;
+
+			public void AndroidThunkJava_ShowProfileUI(long taskPtr, String playerId, String currentPlayerName, String otherPlayerName) {
+			pendingProfileTaskPtr = taskPtr;
+
+			// Use the method with Alternative Name Hints
+			PlayGames.getPlayersClient(this)
+			.getCompareProfileIntentWithAlternativeNameHints(playerId, otherPlayerName, currentPlayerName)
+			.addOnSuccessListener(intent -> {
+			startActivityForResult(intent, RC_SHOW_PROFILE);
+			})
+			.addOnFailureListener(e -> {
+			android.util.Log.e("UE", "Failed to get profile intent: " + e.toString());
+			if (pendingProfileTaskPtr != 0) {
+			nativeOnProfileUIClosed(pendingProfileTaskPtr);
+			pendingProfileTaskPtr = 0;
+			}
+			});
+			}
+			// --- External UI Interface End ---
+
+			// --- Player Stats Interface Start ---
+
+			public void AndroidThunkJava_GetPlayerStats(long taskPtr, boolean forceReload) {
+			PlayGames.getPlayerStatsClient(this).loadPlayerStats(forceReload)
+			.addOnSuccessListener(annotatedData -> {
+			PlayerStats stats = annotatedData.get();
+			if (stats != null) {
+			nativeOnPlayerStatsReceived(taskPtr, true, "",
+			stats.getAverageSessionLength(),
+			stats.getDaysSinceLastPlayed(),
+			stats.getNumberOfPurchases(),
+			stats.getNumberOfSessions(),
+			stats.getSessionPercentile(),
+			stats.getSpendPercentile()
+			);
+			} else {
+			nativeOnPlayerStatsReceived(taskPtr, false, "Stats buffer was null", -1,-1,-1,-1,-1,-1);
+			}
+			})
+			.addOnFailureListener(e -> {
+			nativeOnPlayerStatsReceived(taskPtr, false, e.toString(), -1,-1,-1,-1,-1,-1);
+			});
+			}
+			// --- Player Stats Interface End ---
+
+			// --- Events Interface Start ---
+			public void AndroidThunkJava_IncrementEvent(String eventId, int incrementAmount) {
+			PlayGames.getEventsClient(this).increment(eventId, incrementAmount);
+			}
+			// --- Events Interface End ---
+			// --- Google Play V2 Extension End ---
+		</insert>
+	</gameActivityClassAdditions>
+	<gameActivityOnActivityResultAdditions>
+		<insert>
+			// Check if this result is from our Friends Consent popup
+			if (requestCode == SHOW_SHARING_FRIENDS_CONSENT) {
+			if (resultCode == Activity.RESULT_OK) {
+			// User granted consent! Retry the load operation.
+			DoLoadFriends();
+			} else {
+			// User denied consent or cancelled the window. Fail the C++ task.
+			if (pendingFriendsTaskPtr != 0) {
+			nativeOnReadFriendsListComplete(pendingFriendsTaskPtr, false, "User denied friends list consent.", null, null, null);
+			pendingFriendsTaskPtr = 0;
+			}
+			}
+			}
+
+			if (requestCode == RC_SHOW_PROFILE) {
+			if (pendingProfileTaskPtr != 0) {
+			// Tell the native layer the UI has closed
+			nativeOnProfileUIClosed(pendingProfileTaskPtr);
+			pendingProfileTaskPtr = 0;
+			}
+			}
+		</insert>
+	</gameActivityOnActivityResultAdditions>
+</root>
