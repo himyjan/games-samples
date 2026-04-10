@@ -22,7 +22,6 @@
 	<buildGradleAdditions>
 		<insert>
 			dependencies {
-			implementation "com.google.android.gms:play-services-games-v2:20.1.2"
 			implementation "com.google.android.gms:play-services-tasks:18.0.2"
 			}
 		</insert>
@@ -75,7 +74,7 @@
 			Snapshot snapshot = dataOrConflict.isConflict() ? dataOrConflict.getConflict().getSnapshot() : dataOrConflict.getData();
 			if (snapshot != null) {
 			snapshot.getSnapshotContents().writeBytes(data);
-			SnapshotMetadataChange change = new SnapshotMetadataChange.Builder().setDescription("UE5 Save").build();
+            SnapshotMetadataChange change = new SnapshotMetadataChange.Builder().build();
 			PlayGames.getSnapshotsClient(this).commitAndClose(snapshot, change)
 			.addOnSuccessListener(res -> nativeOnGPGSaveComplete(taskPtr, true, "Saved"))
 			.addOnFailureListener(e -> nativeOnGPGSaveComplete(taskPtr, false, e.toString()));
