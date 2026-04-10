@@ -21,6 +21,8 @@
 #include <jni.h>
 #endif
 
+DECLARE_DELEGATE_TwoParams(FOnSaveGameUIClosed, bool /*bSelected*/, FString /*SnapshotName*/);
+
 class FOnlineAsyncTaskGooglePlayExtensionWriteSave;
 class FOnlineAsyncTaskGooglePlayExtensionReadSave;
 class FOnlineAsyncTaskGooglePlayExtensionGetRecallSessionID;
@@ -38,11 +40,15 @@ class FGooglePlayGamesExtensionWrapper
 public:
 	void Init();
 	void Reset();
-
+    
+    void ShowSavedGamesUI(const FString& Title, bool bAllowAdd, bool bAllowDelete, int32 MaxSaves, FOnSaveGameUIClosed OnCloseDelegate);
+    void SetSnapshotMetadata(class UTexture2D* CoverImage, const FString& Description, int64 PlayedTimeMillis, int64 ProgressValue);
 	bool SaveSnapshot(FOnlineAsyncTaskGooglePlayExtensionWriteSave* Task, const FString& FileName, const TArray<uint8>& Data);
 	bool LoadSnapshot(FOnlineAsyncTaskGooglePlayExtensionReadSave* Task, const FString& FileName);
 	
 	bool GetRecallSessionId(FOnlineAsyncTaskGooglePlayExtensionGetRecallSessionID* Task);
+    
+    void SetFriendsConfig(int32 PageSize, bool bForceReload);
 	
 	bool ReadFriendsList(FOnlineAsyncTaskGooglePlayExtensionReadFriendsList* Task);
 	
@@ -51,14 +57,19 @@ public:
 	bool GetPlayerStats(FOnlineAsyncTaskGooglePlayExtensionGetPlayerStats* Task, bool bForceReload);
 	
 	void IncrementEvent(const FString& EventId, int32 IncrementAmount);
+    
+    static FOnSaveGameUIClosed SaveUIClosedDelegate;
 
 private:
 #if PLATFORM_ANDROID
 	jclass WrapperClass = nullptr;
+    jmethodID ShowSavedGamesUIId = nullptr;
+    jmethodID SetSnapshotMetadataId = nullptr;
 	jmethodID SaveId = nullptr;
 	jmethodID LoadId = nullptr;
 	jmethodID GetRecallId = nullptr;
 	jmethodID ReadFriendsListId = nullptr;
+    jmethodID SetFriendsConfigId = nullptr;
 	jmethodID ShowProfileUIId = nullptr;
 	jmethodID GetPlayerStatsId = nullptr;
 	jmethodID IncrementEventId = nullptr;

@@ -24,6 +24,9 @@
 #include "OnlineAsyncTaskGooglePlayExtensionReadSave.h"
 #include "OnlineAsyncTaskGooglePlayExtensionWriteSave.h"
 #include "Async/Async.h"
+#include "Engine/Texture2D.h"
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
 #if PLATFORM_ANDROID
 #include "Android/AndroidJNI.h"
 #include "Android/AndroidApplication.h"
@@ -32,14 +35,19 @@
 
 //Implementation for FGooglePlayGamesExtensionWrapper
 
+FOnSaveGameUIClosed FGooglePlayGamesExtensionWrapper::SaveUIClosedDelegate;
+
 void FGooglePlayGamesExtensionWrapper::Init()
 {
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
+        ShowSavedGamesUIId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_ShowSavedGamesUI", "(Ljava/lang/String;ZZI)V", false);
+        SetSnapshotMetadataId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_SetSnapshotMetadata", "([BLjava/lang/String;JJ)V", false);
 		SaveId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GPGSaveSnapshot", "(JLjava/lang/String;[B)V", false);
 		LoadId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GPGLoadSnapshot", "(JLjava/lang/String;)V", false);	
 	    GetRecallId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetRecallSessionId", "(J)V", false);
+        SetFriendsConfigId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_SetFriendsConfig", "(IZ)V", false);
 	    ReadFriendsListId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_ReadFriendsList", "(J)V", false);
 	    ShowProfileUIId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_ShowProfileUI", "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", false);
 	    GetPlayerStatsId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetPlayerStats", "(JZ)V", false);
@@ -52,13 +60,88 @@ void FGooglePlayGamesExtensionWrapper::Reset()
 {
 #if PLATFORM_ANDROID
 	// Cleanup not strictly necessary for GameActivity methods, but good practice
-	SaveId = nullptr;
+    ShowSavedGamesUIId = nullptr;
+    SetSnapshotMetadataId = nullptr;
+    SaveId = nullptr;
 	LoadId = nullptr;
     GetRecallId = nullptr;
+    SetFriendsConfigId = nullptr;
     ReadFriendsListId = nullptr;
     ShowProfileUIId = nullptr;
     GetPlayerStatsId = nullptr;
     IncrementEventId = nullptr;
+#endif
+}
+
+void FGooglePlayGamesExtensionWrapper::ShowSavedGamesUI(const FString& Title, bool bAllowAdd, bool bAllowDelete, int32 MaxSaves, FOnSaveGameUIClosed OnCloseDelegate)
+{
+    SaveUIClosedDelegate = OnCloseDelegate;
+
+#if PLATFORM_ANDROID
+    if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+    {
+        if (ShowSavedGamesUIId)
+        {
+            jstring jTitle = Env->NewStringUTF(TCHAR_TO_UTF8(*Title));
+            FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, ShowSavedGamesUIId, jTitle, bAllowAdd, bAllowDelete, MaxSaves);
+            Env->DeleteLocalRef(jTitle);
+        }
+    }
+#endif
+}
+
+void FGooglePlayGamesExtensionWrapper::SetSnapshotMetadata(UTexture2D* CoverImage, const FString& Description, int64 PlayedTimeMillis, int64 ProgressValue)
+{
+    TArray64<uint8> CompressedData;
+
+    if (CoverImage && CoverImage->GetPlatformData() && CoverImage->GetPlatformData()->Mips.Num() > 0)
+    {
+        // 1. Get raw pixel data from the first Mip
+        FTexture2DMipMap& Mip = CoverImage->GetPlatformData()->Mips[0];
+        int32 Width = Mip.SizeX;
+        int32 Height = Mip.SizeY;
+        
+        uint8* Data = (uint8*)Mip.BulkData.Lock(LOCK_READ_ONLY);
+        if (Data)
+        {
+            TArray<uint8> RawImageData;
+            RawImageData.Append(Data, Mip.BulkData.GetBulkDataSize());
+            Mip.BulkData.Unlock();
+
+            // 2. Compress raw pixels to PNG so Java BitmapFactory can read it
+            IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+            TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+
+            // Note: Most Unreal textures are BGRA8
+            if (ImageWrapper.IsValid() && ImageWrapper->SetRaw(RawImageData.GetData(), RawImageData.Num(), Width, Height, ERGBFormat::BGRA, 8))
+            {
+                CompressedData = ImageWrapper->GetCompressed();
+            }
+        }
+    }
+
+    // 3. JNI Call (Scoping fixed: CompressedData is now accessible here)
+#if PLATFORM_ANDROID
+    if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+    {
+        if (SetSnapshotMetadataId)
+        {
+            jbyteArray jCover = nullptr;
+            if (CompressedData.Num() > 0)
+            {
+                jCover = Env->NewByteArray(CompressedData.Num());
+                Env->SetByteArrayRegion(jCover, 0, CompressedData.Num(), (const jbyte*)CompressedData.GetData());
+            }
+
+            jstring jDesc = Env->NewStringUTF(TCHAR_TO_UTF8(*Description));
+            
+            FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SetSnapshotMetadataId,
+                jCover, jDesc, (jlong)PlayedTimeMillis, (jlong)ProgressValue);
+            
+            if (jCover) Env->DeleteLocalRef(jCover);
+            Env->DeleteLocalRef(jDesc);
+        }
+    }
 #endif
 }
 
@@ -113,6 +196,20 @@ bool FGooglePlayGamesExtensionWrapper::GetRecallSessionId(FOnlineAsyncTaskGoogle
     }
 #endif
     return false;
+}
+
+void FGooglePlayGamesExtensionWrapper::SetFriendsConfig(int32 PageSize, bool bForceReload)
+{
+#if PLATFORM_ANDROID
+    if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+    {
+        if (SetFriendsConfigId)
+        {
+            jboolean jForce = bForceReload ? JNI_TRUE : JNI_FALSE;
+            FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SetFriendsConfigId, (jint)PageSize, jForce);
+        }
+    }
+#endif
 }
 
 bool FGooglePlayGamesExtensionWrapper::ReadFriendsList(FOnlineAsyncTaskGooglePlayExtensionReadFriendsList* Task)
@@ -187,6 +284,18 @@ void FGooglePlayGamesExtensionWrapper::IncrementEvent(const FString& EventId, in
 extern "C" {
     // JNI Export must now match GameActivity package and class
     // Format: Java_com_epicgames_unreal_GameActivity_METHODNAME
+
+    JNIEXPORT void JNICALL Java_com_epicgames_unreal_GameActivity_nativeOnSavedGamesUIClosed(JNIEnv* jEnv, jobject thiz, jboolean bSelected, jstring jSnapshotName)
+    {
+        FString SnapshotName = FJavaHelper::FStringFromParam(jEnv, jSnapshotName);
+        
+        // Execute on Game Thread since JNI comes from the Android UI thread
+        AsyncTask(ENamedThreads::GameThread, [bSelected, SnapshotName]()
+        {
+            FGooglePlayGamesExtensionWrapper::SaveUIClosedDelegate.ExecuteIfBound((bool)bSelected, SnapshotName);
+            FGooglePlayGamesExtensionWrapper::SaveUIClosedDelegate.Unbind();
+        });
+    }
     
     JNIEXPORT void JNICALL Java_com_epicgames_unreal_GameActivity_nativeOnGPGSaveComplete(JNIEnv* jEnv, jobject thiz, jlong TaskPtr, jboolean bSuccess, jstring jMsg)
     {
