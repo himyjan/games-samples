@@ -19,6 +19,7 @@
 #include "OnlineSubsystemGooglePlayExtension.h"
 #include "OnlineAsyncTaskGooglePlayExtensionWriteSave.h"
 #include "OnlineAsyncTaskGooglePlayExtensionReadSave.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 
 //Implementation for FOnlineUserCloudGooglePlayExtension
 
@@ -51,14 +52,20 @@ bool FOnlineUserCloudGooglePlayExtension::GetFileContents(const FUniqueNetId& Us
 
 void FOnlineUserCloudGooglePlayExtension::OnWriteComplete(bool bSuccess, const FUniqueNetId& NetId, const FString& FileName) 
 {
-	FUniqueNetIdWrapper Id;
-	TriggerOnWriteUserFileCompleteDelegates(bSuccess, *Id.GetUniqueNetId(), FileName);
+	if (const IOnlineIdentityPtr IdentityInterface = Subsystem->GetIdentityInterface();
+		IdentityInterface.IsValid())
+	{
+		TriggerOnWriteUserFileCompleteDelegates(bSuccess, *IdentityInterface->GetUniquePlayerId(0), FileName);
+	}
 }
 
 void FOnlineUserCloudGooglePlayExtension::OnReadComplete(bool bSuccess, const FUniqueNetId& NetId, const FString& FileName) 
 {
-	FUniqueNetIdWrapper Id;
-	TriggerOnReadUserFileCompleteDelegates(bSuccess, *Id.GetUniqueNetId(), FileName);
+	if (const IOnlineIdentityPtr IdentityInterface = Subsystem->GetIdentityInterface();
+		IdentityInterface.IsValid())
+	{
+		TriggerOnReadUserFileCompleteDelegates(bSuccess, *IdentityInterface->GetUniquePlayerId(0), FileName);
+	}
 }
 
 void FOnlineUserCloudGooglePlayExtension::UpdateCache(const FString& FileName, const TArray<uint8>& Data)

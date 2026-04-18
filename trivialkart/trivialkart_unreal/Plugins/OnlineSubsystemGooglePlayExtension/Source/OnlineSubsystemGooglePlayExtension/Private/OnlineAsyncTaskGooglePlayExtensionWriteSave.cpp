@@ -18,6 +18,7 @@
 #include "OnlineAsyncTaskGooglePlayExtensionWriteSave.h"
 
 #include "GooglePlayGamesExtensionWrapper.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 
 //Implementation for FOnlineAsyncTaskGooglePlayExtensionWriteSave
 
@@ -44,6 +45,9 @@ void FOnlineAsyncTaskGooglePlayExtensionWriteSave::Tick()
 
 void FOnlineAsyncTaskGooglePlayExtensionWriteSave::TriggerDelegates()
 {
-	FUniqueNetIdWrapper Id;
-	Delegate.ExecuteIfBound(bWasSuccessful, *Id.GetUniqueNetId(), FileName);
+	if (const IOnlineIdentityPtr IdentityInterface = Subsystem->GetIdentityInterface();
+		IdentityInterface.IsValid())
+	{
+		Delegate.ExecuteIfBound(bWasSuccessful, *IdentityInterface->GetUniquePlayerId(0), FileName);
+	}
 }

@@ -78,5 +78,7 @@ private:
 	void OnQueryAchievementsCompleted(const FUniqueNetId& UniqueNetId, bool bWasSuccessful);
 	
 	void OnQueryOnlineStoreOfferCompleted(bool bWasSuccessful, const TArray<FUniqueOfferId>& OfferIds, const FString& Error);
+
+	void OnCloudReadComplete(bool bWasSuccessful, const FUniqueNetId& UserId, const FString& FileName);
 	
 };

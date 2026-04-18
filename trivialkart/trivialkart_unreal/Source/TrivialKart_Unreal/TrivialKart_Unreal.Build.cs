@@ -30,6 +30,7 @@ public class TrivialKart_Unreal : ModuleRules
 			"InputCore", 
 			"EnhancedInput", 
 			"Paper2D",
+			"UMG",
 			"Slate",
 			"SlateCore"
 		});

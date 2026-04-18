@@ -19,6 +19,7 @@
 
 #include "GooglePlayGamesExtensionWrapper.h"
 #include "OnlineUserCloudGooglePlayExtension.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 
 //Implementation for FOnlineAsyncTaskGooglePlayExtensionReadSave
 
@@ -55,6 +56,9 @@ void FOnlineAsyncTaskGooglePlayExtensionReadSave::TriggerDelegates()
 			CloudImpl->UpdateCache(FileName, ReadData);
 		}
 	}
-	FUniqueNetIdWrapper Id;
-	Delegate.ExecuteIfBound(bWasSuccessful, *Id.GetUniqueNetId(), FileName);
+	if (const IOnlineIdentityPtr IdentityInterface = Subsystem->GetIdentityInterface();
+		IdentityInterface.IsValid())
+	{
+		Delegate.ExecuteIfBound(bWasSuccessful, *IdentityInterface->GetUniquePlayerId(0), FileName);
+	}
 }
