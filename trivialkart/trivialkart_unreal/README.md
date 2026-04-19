@@ -4,7 +4,7 @@ A sample game demonstrating the use of Google Play technologies on Android with 
 
 This version of TrivialKart demonstrates:
 
-* **Play Games Services (v2)**: For sign-in, achievements.
+* **Play Games Services (v2)**: For sign-in, achievements, and cloud save (using Online Subsystem GooglePlay Extension).
 * **In-App Purchases (IAP)**.
 
 ---
@@ -125,6 +125,14 @@ Description: `LogIn 5 times`
 Initial State: `Revealed`
 Incremental: `Checked`
 Points: `5`
+
+### Cloud Save
+
+You will also need to
+[enable save games](https://developers.google.com/games/services/console/configuring#enabling_saved_games)
+since TrivialKart uses the Cloud Save feature.
+
+The Cloud Save uses Online Subsystem Google Play Extension Plugin, you need to make sure that the DefaultPlatformService in DefaultEngine.ini is set to GOOGLEPLAYEXTENSION.
 
 ---
 
