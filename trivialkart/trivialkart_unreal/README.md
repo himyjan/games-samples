@@ -126,7 +126,7 @@ Initial State: `Revealed`
 Incremental: `Checked`
 Points: `5`
 
-### Cloud Save
+### 3. Cloud Save
 
 You will also need to
 [enable save games](https://developers.google.com/games/services/console/configuring#enabling_saved_games)
