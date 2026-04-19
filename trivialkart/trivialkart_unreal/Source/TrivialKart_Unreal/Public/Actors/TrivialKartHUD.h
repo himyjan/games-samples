@@ -28,6 +28,7 @@ UENUM(BlueprintType)
 enum class EWidgetType : uint8
 {
 	None,
+	Loading,
 	PlayBoard,
 	Garage,
 	PGS,
@@ -50,7 +51,7 @@ class TRIVIALKART_UNREAL_API ATrivialKartHUD : public AHUD
 public:
 	virtual void BeginPlay() override;
 	
-	void AddWidgetToScreen(const EWidgetType WidgetType, int ZOrder = 0);
+	void AddWidgetToScreen(const EWidgetType WidgetType, int32 ZOrder = 0);
 	
 	void RemoveWidgetFromScreen(const EWidgetType WidgetType);
 	
