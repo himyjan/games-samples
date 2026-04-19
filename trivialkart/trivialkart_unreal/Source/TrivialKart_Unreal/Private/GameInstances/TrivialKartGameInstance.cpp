@@ -268,7 +268,10 @@ void UTrivialKartGameInstance::OnCloudReadComplete(bool bWasSuccessful, const FU
 			{
 				UTrivialKartSaveGame* CloudData = Cast<UTrivialKartSaveGame>(UGameplayStatics::LoadGameFromMemory(FileContents));
 
-				SaveGameInstance = CloudData;
+				if (IsValid(CloudData))
+				{
+					SaveGameInstance = CloudData;
+				}
 			}
 		}
 	}
