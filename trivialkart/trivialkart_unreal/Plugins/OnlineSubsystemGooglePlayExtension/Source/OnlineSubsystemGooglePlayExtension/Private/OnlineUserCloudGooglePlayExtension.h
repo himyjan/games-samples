@@ -44,7 +44,7 @@ public:
 	virtual bool DeleteUserFile(const FUniqueNetId& UserId, const FString& FileName, bool bShouldCloudDelete, bool bShouldLocallyDelete) override { return false; }
 	virtual bool RequestUsageInfo(const FUniqueNetId& UserId) override { return false; }
 
-	// Completion Handlers
+	// Save Files Completion Handlers
 	void OnWriteComplete(bool bSuccess, const FUniqueNetId& NetId, const FString& FileName);
 	void OnReadComplete(bool bSuccess, const FUniqueNetId& NetId, const FString& FileName);
 	

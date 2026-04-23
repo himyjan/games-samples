@@ -26,8 +26,7 @@ FOnlineEventsGooglePlayExtension::FOnlineEventsGooglePlayExtension(FOnlineSubsys
 {
 }
 
-bool FOnlineEventsGooglePlayExtension::TriggerEvent(const FUniqueNetId& PlayerId, const TCHAR* EventName,
-                                                    const FOnlineEventParms& Parms)
+bool FOnlineEventsGooglePlayExtension::TriggerEvent(const FUniqueNetId& PlayerId, const TCHAR* EventName, const FOnlineEventParms& Parms)
 {
 	if (!Subsystem || !Subsystem->GPGWrapper.IsValid())
 	{
@@ -46,7 +45,7 @@ bool FOnlineEventsGooglePlayExtension::TriggerEvent(const FUniqueNetId& PlayerId
 		}
 	}
 
-	// Call Java to register the increment
+	// Call Java to register the increment event
 	Subsystem->GPGWrapper->IncrementEvent(FString(EventName), IncrementAmount);
 
 	return true;

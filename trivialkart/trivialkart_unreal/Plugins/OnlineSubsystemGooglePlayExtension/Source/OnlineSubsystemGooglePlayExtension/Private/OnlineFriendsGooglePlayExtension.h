@@ -19,6 +19,9 @@
 #include "Interfaces/OnlineFriendsInterface.h"
 #include "Interfaces/OnlinePresenceInterface.h"
 
+struct FParsedFriendData;
+class FOnlineSubsystemGooglePlayExtension;
+
 class FOnlineFriendGooglePlay : public FOnlineFriend
 {
 public:
@@ -42,8 +45,6 @@ public:
 	FOnlineUserPresence Presence;
 };
 
-struct FParsedFriendData;
-class FOnlineSubsystemGooglePlayExtension;
 /**
 * 
 * Implementation of Online Friends Interface for handling friend lists.

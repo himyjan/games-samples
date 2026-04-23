@@ -45,11 +45,12 @@ public:
 	FOnlineSubsystemGooglePlayExtension() = delete;
 	explicit FOnlineSubsystemGooglePlayExtension(FName InInstanceName);
 	
+	// FTSTickerObjectBase  interface
 	virtual bool Init() override;
 	virtual bool Tick(float DeltaTime) override;
 	virtual bool Shutdown() override;
 	
-	
+	// IOnlineSubsystem interface
 	virtual IOnlineSessionPtr GetSessionInterface() const override;
 	virtual IOnlineFriendsPtr GetFriendsInterface() const override;
 	virtual IOnlinePartyPtr GetPartyInterface() const override;
