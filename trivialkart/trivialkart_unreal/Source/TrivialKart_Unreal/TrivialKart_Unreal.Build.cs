@@ -30,6 +30,7 @@ public class TrivialKart_Unreal : ModuleRules
 			"InputCore", 
 			"EnhancedInput", 
 			"Paper2D",
+			"UMG",
 			"Slate",
 			"SlateCore"
 		});
@@ -42,6 +43,7 @@ public class TrivialKart_Unreal : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Android)
 		{
 			DynamicallyLoadedModuleNames.Add("OnlineSubsystemGooglePlay");
+			DynamicallyLoadedModuleNames.Add("OnlineSubsystemGooglePlayExtension");
 		}
 	}
 }

@@ -40,6 +40,8 @@ public:
 	FOnPurchase OnPurchaseReceived;
 	
 	virtual void Init() override;
+
+	virtual void Shutdown();
 	
 	UFUNCTION(BlueprintCallable, Category = "GameInstance|Authentication")
 	void InitiateAutoLogin();
@@ -51,7 +53,7 @@ public:
 	FString GetPlayerName() const;
 	
 	void AddAchievementProgress(const float Progress, const FString& AchievementName);
-	void StartPurchasing(const FString& OfferID, const int32 Quantity, bool bIsConsumable);
+	void StartPurchasing(const FUniqueOfferId& OfferID, const int32 Quantity, bool bIsConsumable);
 	
 	UTrivialKartSaveGame* LoadGame();
 	void SaveGame(UTrivialKartSaveGame* SaveData);
@@ -70,6 +72,10 @@ protected:
 	
 	UPROPERTY()
 	UTrivialKartSaveGame* SaveGameInstance;
+
+	FDelegateHandle LoginHandle;
+	FDelegateHandle ReadSaveHandle;
+	FDelegateHandle WriteSaveHandle;
 	
 private:
 	void OnLoginCompleted(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& UserId,
@@ -78,5 +84,9 @@ private:
 	void OnQueryAchievementsCompleted(const FUniqueNetId& UniqueNetId, bool bWasSuccessful);
 	
 	void OnQueryOnlineStoreOfferCompleted(bool bWasSuccessful, const TArray<FUniqueOfferId>& OfferIds, const FString& Error);
+
+	void OnCloudReadComplete(bool bWasSuccessful, const FUniqueNetId& UserId, const FString& FileName);
+
+	void OnCloudWriteComplete(bool bWasSuccessful, const FUniqueNetId& UserId, const FString& FileName);
 	
 };

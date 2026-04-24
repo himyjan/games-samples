@@ -24,11 +24,16 @@ DEFINE_LOG_CATEGORY(LogTemplateHUD);
 void ATrivialKartHUD::BeginPlay()
 {
 	Super::BeginPlay();
+	AddWidgetToScreen(EWidgetType::Loading, 10);
 	AddWidgetToScreen(EWidgetType::PlayBoard);
 }
 
 void ATrivialKartHUD::AddWidgetToScreen(const EWidgetType WidgetType, int32 ZOrder)
 {
+#if WITH_EDITOR
+	if (WidgetType == EWidgetType::Loading)
+		return;
+#endif
 	if (!WidgetTemplates.Contains(WidgetType))
 	{
 UE_LOG(LogTemplateHUD, Warning, TEXT("Widget template does not exist"));
