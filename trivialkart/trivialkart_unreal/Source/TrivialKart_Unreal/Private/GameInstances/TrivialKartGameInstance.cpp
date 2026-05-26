@@ -48,7 +48,6 @@ void UTrivialKartGameInstance::Init()
 	}
 	InitiateAutoLogin();
 	// Check unacknowledged purchases on start or foreground
-	CheckPendingPurchases();
 	FCoreDelegates::ApplicationHasEnteredForegroundDelegate.AddUObject(this, &UTrivialKartGameInstance::CheckPendingPurchases);
 }
 
@@ -274,6 +273,8 @@ void UTrivialKartGameInstance::OnLoginCompleted(int32 LocalUserNum, bool bWasSuc
 				CloudInterface->ReadUserFile(*IdentityInterface->GetUniquePlayerId(0), "TrivialKartCloudSave");
 			}
 		}
+		// Check unacknowledged purchases on start or foreground
+		CheckPendingPurchases();
 	}
 }
 
