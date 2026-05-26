@@ -54,7 +54,7 @@ public:
 	
 	void AddAchievementProgress(const float Progress, const FString& AchievementName);
 	void StartPurchasing(const FUniqueOfferId& OfferID, const int32 Quantity, bool bIsConsumable);
-	
+	void CheckPendingPurchases();
 	UTrivialKartSaveGame* LoadGame();
 	void SaveGame(UTrivialKartSaveGame* SaveData);
 	
