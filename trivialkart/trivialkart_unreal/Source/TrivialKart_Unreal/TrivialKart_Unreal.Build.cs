@@ -37,13 +37,14 @@ public class TrivialKart_Unreal : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] { 
 			"OnlineSubsystem", 
-			"OnlineSubsystemUtils" 
-		});
+			"OnlineSubsystemUtils",
+            "Json",
+            "JsonUtilities"
+        });
 		
 		if (Target.Platform == UnrealTargetPlatform.Android)
 		{
 			DynamicallyLoadedModuleNames.Add("OnlineSubsystemGooglePlay");
-			DynamicallyLoadedModuleNames.Add("OnlineSubsystemGooglePlayExtension");
 		}
 	}
 }
