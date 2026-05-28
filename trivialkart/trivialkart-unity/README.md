@@ -15,9 +15,9 @@ and Play license status
 
 ## Pre-requisites
 
-* Unity 6.0 LTS or higher with Android build support (Play plugins are
+* Unity 6.3 LTS or higher with Android build support is recommended (Play plugins are
 compatible with earlier versions of Unity, but the TrivialKart project is
-built using Unity 6.0 LTS)
+built using Unity 6000.3.15f1)
 
 ### Pre-requsities for enabling Google Play features
 
@@ -57,7 +57,7 @@ available if the subscription is active.
 1. Go to the
 [Google Play Developer Console](https://play.google.com/apps/publish)
 and create a new application.
-2. Navigate to `Monetise with Play -> Monetisation Setup`
+2. Navigate to `Monetize with Play -> Monetization setup`
 Copy the Base64-encoded public key text in the `Licensing` area. You will need
 to use this key when configuring Unity IAP.
 
@@ -75,7 +75,7 @@ the `Package Name` field.
 Follow the instructions at
 [Setting up Unity IAP](https://docs.unity.com/ugs/en-us/manual/iap/manual/get-started)
 
-This sample was tested using version 5.0 of the Unity In App Purchasing
+This sample was tested using version 5.3.0 of the Unity In App Purchasing
 package installed through the Package Manager. We recommend this as a minimum
 version for this sample. Use of earlier versions, or the older version of
 Unity IAP available on the Unity Asset Store is not supported.
@@ -322,17 +322,21 @@ You should also disable any lines requesting permissions in your Unity code. See
 appropriate scripting defines.
 5. Create a build using the normal Unity build process.
 
-## Support
+## Troubleshooting
 
 If you've found any errors or bugs in this sample game, please
 [file an issue](https://github.com/android/games-samples/issues).
 
-This is not an officially supported Google product.
+**Note:** This is not an officially supported Google product.
 
 ### Build version workarounds
 
 If you forget to select the version you want to build before closing Unity, you may be unable to see the `TrivialKart > BuildOptions` menu.
 To fix it, delete the directives under `Edit > Project Settings > Player > Other Settings > Script Compilation` and restart Unity.
+
+### If dependency-related errors occur
+
+If you encounter issues such as dependency-related errors, try `Assets > Reimport All` from the menu bar.
 
 ## Further reading
 
@@ -340,6 +344,8 @@ To fix it, delete the directives under `Edit > Project Settings > Player > Other
 * [Unity IAP](https://docs.unity.com/ugs/en-us/manual/iap/manual/get-started)
 
 ## CHANGELOG
+
+2026-05-22: 1.1.2 - Upgraded to Unity 6.3 LTS and com.unity.purchasing 5.3.0 and changed the Support section to Troubleshooting and added content.
 
 2025-09-20: 1.1.1 - Upgraded to Unity 6.0 LTS and PGS v2.
 
