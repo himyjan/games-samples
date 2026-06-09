@@ -62,8 +62,8 @@ public class GameData
     private const int InitialCoinAmount = 20;
     private const int TotalCarCount = 4;
     private const int TotalBackgroundCount = 2;
-    private PlayerController _playerController = Object.FindFirstObjectByType<PlayerController>();
-    private GameObject _backgroundImages = GameObject.Find("Background/backGroundImages").gameObject;
+    private PlayerController _playerController;
+    private GameObject _backgroundImages;
 
 
     public GameData()
@@ -186,7 +186,11 @@ public class GameData
     public void UpdateCarInUse(CarList.Car targetCar)
     {
         carInUseName = targetCar.Name;
-        _playerController.UpdateCarInUse();
+        if (_playerController == null)
+        {
+            _playerController = Object.FindFirstObjectByType<PlayerController>();
+        }
+        _playerController?.UpdateCarInUse();
     }
 
     // Check if the user owns a specific background.
@@ -201,9 +205,17 @@ public class GameData
     {
         backgroundInUseName = targetBackground.Name;
 
-        foreach (Transform background in _backgroundImages.transform)
+        if (_backgroundImages == null)
         {
-            background.gameObject.GetComponent<SpriteRenderer>().sprite = targetBackground.ImageSprite;
+            _backgroundImages = GameObject.Find("Background/backGroundImages");
+        }
+
+        if (_backgroundImages != null)
+        {
+            foreach (Transform background in _backgroundImages.transform)
+            {
+                background.gameObject.GetComponent<SpriteRenderer>().sprite = targetBackground.ImageSprite;
+            }
         }
     }
 

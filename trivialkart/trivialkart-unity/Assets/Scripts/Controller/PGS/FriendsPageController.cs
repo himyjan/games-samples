@@ -178,15 +178,20 @@ public class FriendsPageController : MonoBehaviour
     // the string listing all the user's friends, comma-delimited
     private void AddFriendsFromList()
     {
-        foreach (var friend in PlayGamesPlatform.Instance.localUser.friends)
+        var localUser = PlayGamesPlatform.Instance.localUser;
+        if (localUser != null && localUser.friends != null)
         {
-            if (string.IsNullOrEmpty(_friendsList))
+            foreach (var friend in localUser.friends)
             {
-                _friendsList = friend.userName;
-            }
-            else
-            {
-                _friendsList += (", " + friend.userName);
+                if (friend == null) continue;
+                if (string.IsNullOrEmpty(_friendsList))
+                {
+                    _friendsList = friend.userName;
+                }
+                else
+                {
+                    _friendsList += (", " + friend.userName);
+                }
             }
         }
     }

@@ -100,23 +100,20 @@ public class CarMove : MonoBehaviour
 #if PLAY_GAMES_SERVICES
     private void CheckDistanceAchievement(float newDistance)
     {
-        if (newDistance >= ACHIEVEMENT_DRIVE_DISTANCE &&
+        if (_pgsController != null &&
+            newDistance >= ACHIEVEMENT_DRIVE_DISTANCE &&
             _pgsController.CurrentSignInStatus == PGSController.PgsSigninStatus.PgsSigninLoggedIn)
         {
             var achievementManager = _pgsController.AchievementManager;
             if (achievementManager != null)
             {
-                if (achievementManager.GetAchievementUnlocked(
+                if (!achievementManager.GetAchievementUnlocked(
                         PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Drive))
-                {
-                    _driveAchievementUnlocked = true;
-                }
-                else
                 {
                     achievementManager.UnlockAchievement(
                         PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Drive);
-                    _driveAchievementUnlocked = true;
                 }
+                _driveAchievementUnlocked = true;
             }
         }
     }
@@ -126,7 +123,10 @@ public class CarMove : MonoBehaviour
     {
 #if PLAY_GAMES_SERVICES
         // Checks to see if we are due to update the distance traveled leaderboard
-        _pgsController.UpdateLeaderboard();
+        if (_pgsController != null)
+        {
+            _pgsController.UpdateLeaderboard();
+        }
 #endif
         // Use keys to control menu/gameplay
         if (_garageAction.WasPressedThisFrame())
