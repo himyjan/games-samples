@@ -28,7 +28,7 @@ public class PurchaseController : MonoBehaviour
         // Placeholder prices
         const float currentPrice = 0.01f;
         const string priceString = "$0.01";
-        var uiPriceChangeController = FindObjectOfType<UIPriceChangeController>();
+        var uiPriceChangeController = FindFirstObjectByType<UIPriceChangeController>();
         if (uiPriceChangeController != null)
         {
             foreach (var coin in CoinList.List)

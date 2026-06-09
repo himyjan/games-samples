@@ -1,4 +1,4 @@
-﻿// Copyright 2022 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ public class LeaderboardPageController : MonoBehaviour
         // an error condition
         _timeSinceLastLeaderboardUpdate = 0f;
         long reportedDistance = (long)GameDataController.GetGameData().distanceTraveled;
-        Social.ReportScore(reportedDistance, GPGSIds.leaderboard_tk_leaderboard_distance,
+        PlayGamesPlatform.Instance.ReportScore(reportedDistance, GPGSIds.leaderboard_tk_leaderboard_distance,
             (bool success) =>
         {
             if (success)
@@ -166,15 +166,15 @@ public class LeaderboardPageController : MonoBehaviour
         IList<string> userIds = new List<string>();
         // Create list of userIds to use with LoadUsers to
         // try and retrieve user names
-        foreach (IScore scores in data.Scores)
+        foreach (PlayGamesScore scores in data.Scores)
         {
             userIds.Add(scores.userID);
         }
 
-        Social.LoadUsers(userIds.ToArray(), (users) =>
+        PlayGamesPlatform.Instance.LoadUsers(userIds.ToArray(), (users) =>
         {
-            foreach(IScore score in data.Scores) {
-                IUserProfile user = FindUser(users, score.userID);
+            foreach(PlayGamesScore score in data.Scores) {
+                PlayGamesUserProfile user = FindUser(users, score.userID);
                 string userName = (user != null) ? user.userName : "unknown";
                 string scoreString = String.Format("#{0} - {1} by {2}\n",
                     score.rank.ToString(), score.value.ToString(), userName);
@@ -185,11 +185,12 @@ public class LeaderboardPageController : MonoBehaviour
         });
     }
 
-    private static IUserProfile FindUser(IUserProfile[] users, string userID)
+    private static PlayGamesUserProfile FindUser(Array users, string userID)
     {
-        foreach (IUserProfile user in users)
+        if (users == null) return null;
+        foreach (PlayGamesUserProfile user in users)
         {
-            if (user.id.Equals(userID))
+            if (user != null && user.id.Equals(userID))
             {
                 return user;
             }

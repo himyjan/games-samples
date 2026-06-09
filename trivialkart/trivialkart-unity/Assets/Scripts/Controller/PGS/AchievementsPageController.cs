@@ -1,4 +1,4 @@
-﻿// Copyright 2022 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ public class AchievementsPageController : MonoBehaviour
 
     void Awake()
     {
-        _pgsController = FindObjectOfType<PGSController>();
+        _pgsController = FindFirstObjectByType<PGSController>();
     }
 
     // Refresh the page when it becomes active
@@ -49,7 +49,7 @@ public class AchievementsPageController : MonoBehaviour
 #if PLAY_GAMES_SERVICES
         string achievementString = "Achievements\n";
         achievementString += GenerateAchievementString(
-            PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Distance);
+            PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Drive);
         achievementString += GenerateAchievementString(
             PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Truck);
         Text achievementText = this.achievementText.GetComponent<Text>();

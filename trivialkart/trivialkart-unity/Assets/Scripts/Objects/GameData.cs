@@ -1,4 +1,4 @@
-﻿// Copyright 2022 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public class GameData
     private const int InitialCoinAmount = 20;
     private const int TotalCarCount = 4;
     private const int TotalBackgroundCount = 2;
-    private PlayerController _playerController = Object.FindObjectOfType<PlayerController>();
+    private PlayerController _playerController = Object.FindFirstObjectByType<PlayerController>();
     private GameObject _backgroundImages = GameObject.Find("Background/backGroundImages").gameObject;
 
 
@@ -125,7 +125,7 @@ public class GameData
 
     private void UpdateCoinText()
     {
-        Object.FindObjectOfType<StorePageController>().SetCoinsBasedOnGameData();
+        Object.FindFirstObjectByType<StorePageController>().SetCoinsBasedOnGameData();
     }
 
     // Update coins when player purchases coins.
@@ -147,7 +147,7 @@ public class GameData
         }
 
         carIndexToOwnership[(int) car.Name] = Ownership.Owned;
-        Object.FindObjectOfType<CarStorePageController>()?.RefreshPage();
+        Object.FindFirstObjectByType<CarStorePageController>()?.RefreshPage();
     }
 
 #if PLAY_GAMES_SERVICES
@@ -157,7 +157,7 @@ public class GameData
     {
         if (carName == CarName.Truck)
         {
-            var pgsController = Object.FindObjectOfType<PGSController>();
+            var pgsController = Object.FindFirstObjectByType<PGSController>();
             if (pgsController.CurrentSignInStatus ==
                 PGSController.PgsSigninStatus.PgsSigninLoggedIn)
             {
@@ -228,6 +228,6 @@ public class GameData
             UpdateBackgroundInUse(BackgroundList.MushroomBackground);
         }
 
-        Object.FindObjectOfType<SubscriptionStorePageController>()?.RefreshPage();
+        Object.FindFirstObjectByType<SubscriptionStorePageController>()?.RefreshPage();
     }
 }

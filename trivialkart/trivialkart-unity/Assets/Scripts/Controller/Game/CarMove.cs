@@ -1,4 +1,4 @@
-﻿// Copyright 2022 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,15 +38,13 @@ public class CarMove : MonoBehaviour
     private const float NoVelocity = 0.01f;
     private const float TurboVelocity = 1.5f;
 
-    private int _clickCounter;
-    private float _firstClickTime;
-    private const float ClickDelay = 0.15f;
 
     private const int NORMAL_SPEED = 1;
     private const int TURBO_SPEED = 2;
 
     // Achievement for going this far
-    private const float ACHIEVEMENT_DISTANCE = 100.0f;
+    private const float ACHIEVEMENT_DRIVE_DISTANCE = 100.0f;
+    private bool _driveAchievementUnlocked = false;
 
     private InputAction _garageAction;
     private InputAction _pgsAction;
@@ -58,10 +56,8 @@ public class CarMove : MonoBehaviour
 
     private void Start()
     {
-        _clickCounter = 0;
-        _firstClickTime = 0f;
-        _gameManger = FindObjectOfType<GameManager>();
-        _pgsController = FindObjectOfType<PGSController>();
+        _gameManger = FindFirstObjectByType<GameManager>();
+        _pgsController = FindFirstObjectByType<PGSController>();
         // Get the carObj corresponding to the car game object the script attached to.
         _carObj = CarList.GetCarByName(carName);
         _rigidbody2D = GetComponent<Rigidbody2D>();
@@ -93,7 +89,10 @@ public class CarMove : MonoBehaviour
         newDistance += GameDataController.GetGameData().distanceTraveled;
         GameDataController.GetGameData().distanceTraveled = newDistance;
 #if PLAY_GAMES_SERVICES
-        CheckDistanceAchievement(newDistance);
+        if (!_driveAchievementUnlocked)
+        {
+            CheckDistanceAchievement(newDistance);
+        }
 #endif
         _odometerText.text = newDistance.ToString("N1", CultureInfo.CurrentCulture);
     }
@@ -101,15 +100,23 @@ public class CarMove : MonoBehaviour
 #if PLAY_GAMES_SERVICES
     private void CheckDistanceAchievement(float newDistance)
     {
-        if (_pgsController.CurrentSignInStatus == PGSController.PgsSigninStatus.PgsSigninLoggedIn)
+        if (newDistance >= ACHIEVEMENT_DRIVE_DISTANCE &&
+            _pgsController.CurrentSignInStatus == PGSController.PgsSigninStatus.PgsSigninLoggedIn)
         {
             var achievementManager = _pgsController.AchievementManager;
-            if (!achievementManager.GetAchievementUnlocked(
-                    PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Distance) &&
-                newDistance >= ACHIEVEMENT_DISTANCE)
+            if (achievementManager != null)
             {
-                achievementManager.UnlockAchievement(
-                    PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Distance);
+                if (achievementManager.GetAchievementUnlocked(
+                        PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Drive))
+                {
+                    _driveAchievementUnlocked = true;
+                }
+                else
+                {
+                    achievementManager.UnlockAchievement(
+                        PGSAchievementManager.TrivialKartAchievements.Tk_Achievement_Drive);
+                    _driveAchievementUnlocked = true;
+                }
             }
         }
     }
@@ -174,7 +181,6 @@ public class CarMove : MonoBehaviour
                     break;
             }
         }
-        _clickCounter = 0;
     }
 
     private void Drive()
