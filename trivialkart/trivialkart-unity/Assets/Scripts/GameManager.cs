@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
         GameDataController.LoadGameData();
         _cloudLoadMessageActive = false;
 #if PLAY_GAMES_SERVICES
-        _pgsController = FindObjectOfType<PGSController>();
+        _pgsController = FindFirstObjectByType<PGSController>();
         _pgsController.SetLocalSaveDataReady();
         _cloudStatus = CloudStatus.CloudStatus_WaitingForInit;
         // Display a please wait message while PGS signin and cloud save

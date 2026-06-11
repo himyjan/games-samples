@@ -27,7 +27,7 @@ public class PGSAchievementManager : MonoBehaviour
     public enum TrivialKartAchievements
     {
         // Achievement for driving more than a certain distance
-        Tk_Achievement_Distance = 0,
+        Tk_Achievement_Drive = 0,
         // Achievement for purchasing the truck
         Tk_Achievement_Truck = 1
     }
@@ -108,8 +108,8 @@ public class PGSAchievementManager : MonoBehaviour
     public void UnlockAchievement(TrivialKartAchievements achievementId)
     {
 #if PLAY_GAMES_SERVICES
-        Social.ReportProgress(_achievementInfo[(int) achievementId].achievementId,
-            100.0f, (bool success) => {
+        PlayGamesPlatform.Instance.ReportProgress(_achievementInfo[(int) achievementId].achievementId,
+            100.0, (bool success) => {
                 if (success)
                 {
                     _achievementInfo[(int) achievementId].achievementUnlocked = true;

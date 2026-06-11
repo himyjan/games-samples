@@ -1,4 +1,4 @@
-﻿// Copyright 2022 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ public class GameData
     private const int InitialCoinAmount = 20;
     private const int TotalCarCount = 4;
     private const int TotalBackgroundCount = 2;
-    private PlayerController _playerController = Object.FindObjectOfType<PlayerController>();
-    private GameObject _backgroundImages = GameObject.Find("Background/backGroundImages").gameObject;
+    private PlayerController _playerController;
+    private GameObject _backgroundImages;
 
 
     public GameData()
@@ -125,7 +125,7 @@ public class GameData
 
     private void UpdateCoinText()
     {
-        Object.FindObjectOfType<StorePageController>().SetCoinsBasedOnGameData();
+        Object.FindFirstObjectByType<StorePageController>().SetCoinsBasedOnGameData();
     }
 
     // Update coins when player purchases coins.
@@ -147,7 +147,7 @@ public class GameData
         }
 
         carIndexToOwnership[(int) car.Name] = Ownership.Owned;
-        Object.FindObjectOfType<CarStorePageController>()?.RefreshPage();
+        Object.FindFirstObjectByType<CarStorePageController>()?.RefreshPage();
     }
 
 #if PLAY_GAMES_SERVICES
@@ -157,7 +157,7 @@ public class GameData
     {
         if (carName == CarName.Truck)
         {
-            var pgsController = Object.FindObjectOfType<PGSController>();
+            var pgsController = Object.FindFirstObjectByType<PGSController>();
             if (pgsController.CurrentSignInStatus ==
                 PGSController.PgsSigninStatus.PgsSigninLoggedIn)
             {
@@ -186,7 +186,11 @@ public class GameData
     public void UpdateCarInUse(CarList.Car targetCar)
     {
         carInUseName = targetCar.Name;
-        _playerController.UpdateCarInUse();
+        if (_playerController == null)
+        {
+            _playerController = Object.FindFirstObjectByType<PlayerController>();
+        }
+        _playerController?.UpdateCarInUse();
     }
 
     // Check if the user owns a specific background.
@@ -201,9 +205,17 @@ public class GameData
     {
         backgroundInUseName = targetBackground.Name;
 
-        foreach (Transform background in _backgroundImages.transform)
+        if (_backgroundImages == null)
         {
-            background.gameObject.GetComponent<SpriteRenderer>().sprite = targetBackground.ImageSprite;
+            _backgroundImages = GameObject.Find("Background/backGroundImages");
+        }
+
+        if (_backgroundImages != null)
+        {
+            foreach (Transform background in _backgroundImages.transform)
+            {
+                background.gameObject.GetComponent<SpriteRenderer>().sprite = targetBackground.ImageSprite;
+            }
         }
     }
 
@@ -228,6 +240,6 @@ public class GameData
             UpdateBackgroundInUse(BackgroundList.MushroomBackground);
         }
 
-        Object.FindObjectOfType<SubscriptionStorePageController>()?.RefreshPage();
+        Object.FindFirstObjectByType<SubscriptionStorePageController>()?.RefreshPage();
     }
 }

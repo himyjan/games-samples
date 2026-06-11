@@ -1,4 +1,4 @@
-﻿// Copyright 2022 Google LLC
+// Copyright 2022 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -178,15 +178,20 @@ public class FriendsPageController : MonoBehaviour
     // the string listing all the user's friends, comma-delimited
     private void AddFriendsFromList()
     {
-        foreach (var friend in Social.localUser.friends)
+        var localUser = PlayGamesPlatform.Instance.localUser;
+        if (localUser != null && localUser.friends != null)
         {
-            if (string.IsNullOrEmpty(_friendsList))
+            foreach (var friend in localUser.friends)
             {
-                _friendsList = friend.userName;
-            }
-            else
-            {
-                _friendsList += (", " + friend.userName);
+                if (friend == null) continue;
+                if (string.IsNullOrEmpty(_friendsList))
+                {
+                    _friendsList = friend.userName;
+                }
+                else
+                {
+                    _friendsList += (", " + friend.userName);
+                }
             }
         }
     }
