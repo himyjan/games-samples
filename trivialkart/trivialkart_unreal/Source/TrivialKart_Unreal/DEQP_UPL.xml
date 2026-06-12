@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<init>
+		<log text="[DEQP_UPL] Initializing Pure Log Verification without CDATA..."/>
+	</init>
+
+	<gameActivityOnCreateAdditions>
+		<insert>
+			// =================================================================
+			// [DEQP SELECTOR LOG TEST] Pure log code without CommandLine variable
+			// =================================================================
+			boolean testSupportsModernVulkan = false;
+			int testDeqpLevel = 0;
+			String testDeqpDate = "Unknown";
+
+			if (android.os.Build.VERSION.SDK_INT >= 24) {
+			// 1. Check if target dEQP level (2024-03-01) is supported
+			testSupportsModernVulkan = getPackageManager().hasSystemFeature("android.software.vulkan.deqp.level", 0x7e80301);
+
+			// 2. Extract the actual dEQP level value from the device
+			android.content.pm.FeatureInfo[] features = getPackageManager().getSystemAvailableFeatures();
+			if (features != null) {
+			for (android.content.pm.FeatureInfo feature : features) {
+			if (feature != null &amp;&amp; feature.name != null &amp;&amp; feature.name.equals("android.software.vulkan.deqp.level")) {
+			testDeqpLevel = feature.version;
+			break;
+			}
+			}
+			}
+
+			// 3. Convert to YYYY-MM-DD format using bitwise operations (escaped for parser safety)
+			if (testDeqpLevel > 0) {
+			int year = (testDeqpLevel &gt;&gt; 16) &amp; 0xFFFF;
+			int month = (testDeqpLevel &gt;&gt; 8) &amp; 0xFF;
+			int day = testDeqpLevel &amp; 0xFF;
+			testDeqpDate = String.format("%04d-%02d-%02d", year, month, day);
+			}
+
+			// [Log] Logcat output statement cleaned up with standard spacing
+			android.util.Log.w("UE_RHI_Selector", "==================================================");
+			android.util.Log.w("UE_RHI_Selector", "Device Model   : " + android.os.Build.MODEL);
+			android.util.Log.w("UE_RHI_Selector", "OS Version     : Android " + android.os.Build.VERSION.RELEASE);
+			android.util.Log.w("UE_RHI_Selector", "API Level      : " + android.os.Build.VERSION.SDK_INT);
+			android.util.Log.w("UE_RHI_Selector", "Device dEQP    : 0x" + Integer.toHexString(testDeqpLevel) + " (" + testDeqpDate + ")");
+			android.util.Log.w("UE_RHI_Selector", "Target dEQP    : 0x7e80301 (2024-03-01)");
+			android.util.Log.w("UE_RHI_Selector", "Modern Vulkan? : " + testSupportsModernVulkan);
+			android.util.Log.w("UE_RHI_Selector", "==================================================");
+			} else {
+			android.util.Log.w("UE_RHI_Selector", "Device API Level is below 24. Vulkan dEQP check skipped.");
+			}
+			// =================================================================
+		</insert>
+	</gameActivityOnCreateAdditions>
+
+</root>
