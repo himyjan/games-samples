@@ -16,7 +16,7 @@
 
 
 using UnrealBuildTool;
-
+using System.IO;
 public class TrivialKart_Unreal : ModuleRules
 {
 	public TrivialKart_Unreal(ReadOnlyTargetRules Target) : base(Target)
@@ -45,6 +45,8 @@ public class TrivialKart_Unreal : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Android)
 		{
 			DynamicallyLoadedModuleNames.Add("OnlineSubsystemGooglePlay");
+			string uplPath = Path.Combine(ModuleDirectory, "DEQP_UPL.xml");
+			AdditionalPropertiesForReceipt.Add("AndroidPlugin", uplPath);
 		}
 	}
 }
