@@ -107,7 +107,7 @@ For more information see the codelab: [Using Play Asset Delivery in native games
 
 ## Version history
 
-1.2.5 - Updatd to current AGDK/NDK/AGP versions, 16KB page compatible fix
+1.2.5 - Updated to current AGDK/NDK/AGP versions, 16KB page compatible fix
 1.2.1 - Updated to current AGDK/NDK/AGP versions, deprecated Android Performance Tuner integration
 1.2.0 - Major refactor to add basegameframework support, Vulkan/GLES simplerenderer, updating AGDK versions
 1.0.4 - Merged Play integrations from AOSP. Play Asset Delivery,
