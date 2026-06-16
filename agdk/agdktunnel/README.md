@@ -26,10 +26,13 @@ feedback on in-game collisions.
 1. cd to `agdk/third_party`
 2. git clone https://github.com/zeux/volk.git
 3. git clone https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+4. Download and install the Vulkan SDK for the `glslc` compiler
+5. Create or edit the `local.properties` file in this directory to add a `glslc.dir` pointing
+to the directory with the `glslc` compiler (i.e. glslc.dir=/Users/foo/VulkanSDK/1.4.341.1/macOS/bin)
 
 ## Building
 
-Open the `agdktunnel' directory in Android Studio 2024.3.1 Patch 1 (Meerkat) or higher.
+Open the `agdktunnel' directory in Android Studio 2026.1.1 Patch 1 (Quail 1) or higher.
 
 ## Library Wrapper notes
 
@@ -104,6 +107,7 @@ For more information see the codelab: [Using Play Asset Delivery in native games
 
 ## Version history
 
+1.2.5 - Updated to current AGDK/NDK/AGP versions, 16KB page compatible fix
 1.2.1 - Updated to current AGDK/NDK/AGP versions, deprecated Android Performance Tuner integration
 1.2.0 - Major refactor to add basegameframework support, Vulkan/GLES simplerenderer, updating AGDK versions
 1.0.4 - Merged Play integrations from AOSP. Play Asset Delivery,
