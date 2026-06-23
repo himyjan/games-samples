@@ -15,7 +15,7 @@ The sample:
 
 ## Prerequisites
 
-Before building in Android Studio 2024.3.1 Patch 1 (Meerkat) the following prerequisites must be
+Before building in Android Studio 2026.1.1 Patch 1 (Quail 1) or higher the following prerequisites must be
 performed:
 
 ## Requirements
@@ -56,6 +56,10 @@ https://developer.android.com/reference/android/os/PerformanceHintManager
 https://developer.android.com/reference/android/os/PowerManager
 
 https://developer.android.com/ndk/reference/group/thermal
+
+## Version history
+
+1.2.3 - Updated to current AGDK/NDK/AGP versions, 16KB page compatible fix
 
 ## License
 
