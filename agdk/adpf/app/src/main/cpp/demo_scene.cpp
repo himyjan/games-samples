@@ -328,35 +328,38 @@ void DemoScene::RenderPanel() {
     ImPlot::SetupAxisLimits(ImAxis_X1, t - history, t, ImGuiCond_Always);
     ImPlot::SetupAxisLimits(ImAxis_Y1, -10000, 10000);
 
-    ImPlot::PlotShaded("Pow drain", &graph_buffer_.Data[0].x,
-                       &graph_buffer_.Data[0].y, graph_buffer_.Data.size(),
+    auto get_x = [](auto& buf) { return buf.Data.empty() ? nullptr : &buf.Data[0].x; };
+    auto get_y = [](auto& buf) { return buf.Data.empty() ? nullptr : &buf.Data[0].y; };
+
+    ImPlot::PlotShaded("Pow drain", get_x(graph_buffer_),
+                       get_y(graph_buffer_), graph_buffer_.Data.size(),
                        -INFINITY,
                        ImPlotSpec(ImPlotProp_FillAlpha, 0.5f,
                                   ImPlotProp_Offset, graph_buffer_.Offset,
                                   ImPlotProp_Stride, (int)(2 * sizeof(float))));
 
-    ImPlot::PlotLine("Forecast x1", &graph_buffer_forecast1_.Data[0].x,
-                     &graph_buffer_forecast1_.Data[0].y,
+    ImPlot::PlotLine("Forecast x1", get_x(graph_buffer_forecast1_),
+                     get_y(graph_buffer_forecast1_),
                      graph_buffer_forecast1_.Data.size(),
                      ImPlotSpec(ImPlotProp_Offset, graph_buffer_forecast1_.Offset,
                                 ImPlotProp_Stride, (int)(2 * sizeof(float))));
-    ImPlot::PlotLine("x10", &graph_buffer_forecast2_.Data[0].x,
-                     &graph_buffer_forecast2_.Data[0].y,
+    ImPlot::PlotLine("x10", get_x(graph_buffer_forecast2_),
+                     get_y(graph_buffer_forecast2_),
                      graph_buffer_forecast2_.Data.size(),
                      ImPlotSpec(ImPlotProp_Offset, graph_buffer_forecast2_.Offset,
                                 ImPlotProp_Stride, (int)(2 * sizeof(float))));
-    ImPlot::PlotLine("x100", &graph_buffer_forecast3_.Data[0].x,
-                     &graph_buffer_forecast3_.Data[0].y,
+    ImPlot::PlotLine("x100", get_x(graph_buffer_forecast3_),
+                     get_y(graph_buffer_forecast3_),
                      graph_buffer_forecast3_.Data.size(),
                      ImPlotSpec(ImPlotProp_Offset, graph_buffer_forecast3_.Offset,
                                 ImPlotProp_Stride, (int)(2 * sizeof(float))));
-    ImPlot::PlotLine("ADPF", &graph_buffer_power1_.Data[0].x,
-                     &graph_buffer_power1_.Data[0].y,
+    ImPlot::PlotLine("ADPF", get_x(graph_buffer_power1_),
+                     get_y(graph_buffer_power1_),
                      graph_buffer_power1_.Data.size(),
                      ImPlotSpec(ImPlotProp_Offset, graph_buffer_power1_.Offset,
                                 ImPlotProp_Stride, (int)(2 * sizeof(float))));
-    ImPlot::PlotLine("NOADPF", &graph_buffer_power2_.Data[0].x,
-                     &graph_buffer_power2_.Data[0].y,
+    ImPlot::PlotLine("NOADPF", get_x(graph_buffer_power2_),
+                     get_y(graph_buffer_power2_),
                      graph_buffer_power2_.Data.size(),
                      ImPlotSpec(ImPlotProp_Offset, graph_buffer_power2_.Offset,
                                 ImPlotProp_Stride, (int)(2 * sizeof(float))));
