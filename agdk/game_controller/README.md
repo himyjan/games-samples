@@ -12,7 +12,7 @@ such as vibration
 
 ## Prerequisites
 
-Before building in Android Studio 2024.3.1 Patch 1 (Meerkat) or higher the following prerequisites
+Before building in Android Studio 2026.1.1 Patch 1 (Quail 1) or higher the following prerequisites
 must be performed:
 
 ### ImGui
@@ -22,8 +22,12 @@ must be performed:
 
 ## Building
 
-Open the `game_controller` directory in Android Studio 2021.2 or higher. You can
+Open the `game_controller` directory in Android Studio 2026.1.1 Patch 1 (Quail 1) or higher. You can
 then build and run the samples from Android Studio.
+
+## Version history
+
+1.1.4 - Updated to current AGDK/NDK/AGP versions, 16KB page compatible fix
 
 ## License
 

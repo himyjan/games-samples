@@ -13,7 +13,7 @@ Note that this sample is just demonstrating the easiest and most distinguishable
 
 ## Prerequisites
 
-Before building in Android Studio 2024.3.1 Patch 1 (Meerkat) or higher, the following prerequisites must be met:
+Before building in Android Studio 2026.1.1 Patch 1 (Quail 1) or higher, the following prerequisites must be met:
 
 ### Requirements
 
@@ -31,7 +31,7 @@ This sample utilizes 3rd party libraries such as Dear Imgui and Bullet physics. 
 
 ## Building
 
-Once the prerequisites are complete, open the folder in Android Studio 2021.2 or higher. You can then build and run the sample from Android Studio
+Once the prerequisites are complete, open the folder in Android Studio 2026.1.1 Patch 1 (Quail 1) or higher. You can then build and run the sample from Android Studio
 
 ## Running
 
@@ -52,6 +52,10 @@ adb shell cmd game mode [standard|performance|battery] <PACKAGE_NAME>
 https://developer.android.com/games/gamemode/gamemode-api
 
 https://developer.android.com/reference/android/app/GameManager
+
+## Version history
+
+1.2.3 - Updated to current AGDK/NDK/AGP versions, 16KB page compatible fix
 
 ## License
 
