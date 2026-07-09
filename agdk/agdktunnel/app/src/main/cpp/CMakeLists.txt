@@ -152,7 +152,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # add lib dependencies
 target_link_libraries(${CMAKE_PROJECT_NAME}
-     PUBLIC com.google.android.gms.gni.c::gni_shared
+     PUBLIC com.google.android.gms.gni.c::gni_static
      android
      atomic
      c++
